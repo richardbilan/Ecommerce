@@ -1,0 +1,68 @@
+
+/* Content Layout */
+.content {
+    flex: 1;
+    padding: 20px;
+    background-color: #ffffff;
+    height: 100vh;
+}
+
+.summary {
+    display: flex;
+    gap: 10px;
+}
+
+.card {
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    margin-left: 20px;
+    font-size: 14px; /* Default font size for titles */
+}
+
+.card span {
+    display: block;
+    font-size: 24px; /* Make values larger */
+    font-weight: bold;
+    margin-top: 5px; /* Add spacing */
+}
+
+
+.charts {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.chart {
+    width: 50%;
+    height: 200px;
+    background: #eee;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.best-selling {
+    display: flex;
+    gap: 10px; /* Adds spacing between the two cards */
+    margin-top: 20px;
+}
+
+.best-selling .card {
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-size: 14px;
+    border-radius: 8px;
+    flex: 1; /* Makes both cards equal width */
+}
+
+.best-selling .card span {
+    display: block;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-top: 5px;
+}

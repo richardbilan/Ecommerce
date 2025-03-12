@@ -1,0 +1,107 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.container {
+    display: flex;
+    width: 100%;
+}
+
+.sidebar {
+    width: 90px; /* Smaller width */
+    background: #e6d2b5; /* Beige color */
+    padding: 20px 10px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center items */
+    justify-content: space-between; /* Push logout upwards */
+    gap: 10px; /* Reduce spacing between items */
+}
+
+.logo {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: -100px;
+}
+
+.logo img {
+    width: 60px; /* Adjust as needed */
+    height: 60px; /* Adjust as needed */
+    border-radius: 50%; /* Makes it circular */
+    object-fit: cover; /* Ensures the image fills the circle */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Adds a subtle shadow */
+    margin-bottom: 0px; /* Space between logo and menu */
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+}
+
+.sidebar ul li {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.sidebar ul li a {
+    text-decoration: none;
+    color: black;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.3s, color 0.3s;
+}
+
+.sidebar ul li a i {
+    font-size: 24px; /* Adjust icon size */
+    transition: transform 0.3s, color 0.3s;
+}
+
+.sidebar ul li a img {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 5px;
+    transition: transform 0.3s;
+}
+
+/* Hover effect */
+.sidebar ul li a:hover, 
+.logout a:hover {
+    color: #3f2a0c; 
+}
+
+.sidebar ul li a:hover i, 
+.sidebar ul li a:hover img,
+.logout a:hover i,
+.logout a:hover img {
+    transform: scale(1.2); /* Slightly enlarge icons */
+    color: #3f2a0c; /* Icon color change */
+}
+
+/* Logout Button */
+.logout {
+    margin-bottom: 0px; /* Bring logout button higher */
+    text-align: center;
+}
+
+.logout a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none;
+    color: black;
+    transition: transform 0.3s, color 0.3s;
+}
+
+.logout a img {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 5px;
+}

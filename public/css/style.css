@@ -1,0 +1,265 @@
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* BODY */
+body {
+    background: #fbe9d0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* MAIN CONTAINER */
+.container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* LEFT COLUMN */
+.left {
+    flex: 2;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    position: relative;
+}
+
+/* NAVIGATION BAR */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; 
+    width: 100%;
+    padding: 10px 50px;
+}
+
+/* LOGO STYLING */
+.logo {
+    margin-right: 20px; 
+}
+
+.logo img {
+    height: 50px; 
+    width: auto;
+}
+
+/* NAVIGATION WRAPPER */
+.nav-menu {
+    margin-left: 250px; 
+}
+
+/* NAV MENU */
+.navbar ul {
+    display: flex;
+    list-style: none;
+    gap: 70px;
+    padding: 0;
+    margin-left: 100px;
+}
+
+.navbar ul li a {
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+}
+
+/* TEXT & BUTTONS CONTAINER */
+.text-container {
+    margin-top: 60px;
+    max-width: 500px;
+    margin-left: 80px;
+}
+
+h1 {
+    font-size: 68px;
+    font-weight: bold;
+}
+
+.slide-text {
+    font-family: sans-serif; 
+    font-size: 68px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: transparent; 
+    -webkit-text-stroke: 2px black; /* Create the outline effect */
+    text-stroke: 2px black; 
+    white-space: nowrap; 
+    overflow: visible; 
+    position: relative; 
+}
+
+p {
+    margin-top: 10px;
+    margin-left: -50px;
+    font-size: 16px;
+    opacity: 0;
+    transform: translateX(50px);
+    animation: slideIn 1s ease-in-out forwards 0.5s; 
+}
+
+.btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    margin-left: -50px;
+    opacity: 0;
+    transform: translateX(50px);
+    animation: slideIn 1s ease-in-out forwards 0.8s; /*Delay or sabay sa sip etc.?*/
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(50px); 
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0); 
+    }
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 25px;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+/* BUTTON HOVER EFFECT */
+button:hover {
+    transform: scale(1.05);
+}
+
+#order-btn {
+    background: #c67c4e;
+    color: white;
+}
+
+#okay-btn {
+    background: #563d2d;
+    color: white;
+}
+
+/* RIGHT COLUMN - Smaller Size */
+.right {
+    flex: 0.8; 
+    width: 30vw; 
+    background: linear-gradient(to left, #754922, #8b5a2b);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+    height: 100vh;
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 30px;
+    padding-right: 30px; 
+}
+
+.image-container {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.coffee-cup {
+    width: 320px;
+    height: auto;
+    object-fit: contain;
+    margin-left: -170px;
+    transform: rotate(10deg);
+    filter: drop-shadow(20px 10px 15px rgba(0, 0, 0, 0.5));
+}
+
+.right-text {
+    position: absolute;
+    right: -155px;
+    top: 50%; 
+    transform: translateY(-50%) rotate(270deg);
+    font-size: 60px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: white; 
+    text-align: right;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+/* TEXT ON RIGHT SIDE (Outlined Text - Second Line, Positioned Below) */
+.right-text.outlined {
+    position: absolute;
+    right: -215px;
+    padding: 10px;
+    transform: translateY(-50%) rotate(270deg);
+    font-size: 60px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: transparent; /* Make the inside transparent */
+    align-items: center;
+    line-height: 1.2;
+    white-space: nowrap;
+    -webkit-text-stroke: 2px rgba(255, 255, 255, 0.397); /* Outlined text */
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+    
+    .left {
+        width: 100%;
+        padding: 20px;
+    }
+    
+    .right {
+        width: 100%;
+        height: auto;
+        border-radius: 0;
+        justify-content: center;
+        padding-right: 0;
+    }
+    
+    .image-container {
+        position: static;
+        transform: none;
+        text-align: center;
+    }
+
+    .right-text, .right-text1 {
+        position: static;
+        text-align: center;
+        transform: rotate(0);
+        writing-mode: horizontal-tb;
+    }
+}
+
+/*For BREW */
+.highlight {
+    color: #c67c4e; 
+    -webkit-text-stroke: 0px; 
+    font-weight: 900; 
+}
+
+/*For beans*/
+.bottom-left-image {
+    position: fixed;
+    left: -80px; 
+    bottom: -10px;
+    width: 200px; 
+    height: auto;
+    z-index: 1000; 
+}
