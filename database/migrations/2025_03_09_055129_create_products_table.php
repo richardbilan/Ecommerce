@@ -1,20 +1,28 @@
-<?php 
-namespace App\Models;
+<?php
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class Products extends Model
+return new class extends Migration
 {
-    use HasFactory;
+    public function up(): void
+    {
+        Schema::create('products', function (Blueprint $table) {
+            $table->id();
+            $table->string('product_id')->unique();
+            $table->string('product_name');
+            $table->string('category');
+            $table->decimal('price_hot', 8, 2)->nullable();
+            $table->decimal('price_iced', 8, 2)->nullable();
+            $table->string('availability');
+            $table->string('tag')->nullable(); // This exists now!
+            $table->timestamps();
+        });
+    }
 
-    // You don't need to include product_id in the fillable array as it's auto-incrementing
-    protected $fillable = [
-        'product_name',
-        'category',
-        'price',
-        'availability'
-    ];
-
-    public $timestamps = false;  // Disable timestamps if not using them
-}
+    public function down(): void
+    {
+        Schema::dropIfExists('products');
+    }
+};

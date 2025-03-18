@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Products;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class HomeController extends Controller
 {
     /**
-     * Create a new controller instance.
-     *
-     * @return void
+     * Apply authentication middleware.
      */
     public function __construct()
     {
@@ -18,19 +17,16 @@ class HomeController extends Controller
     }
 
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * Display the home page with all products.
      */
-    public function index(): View
+    public function index()
     {
-        return view('home');
+        $products = Products::all(); // Fetch products from the database
+        return view('home', compact('products')); // Pass the products to the view
     }
 
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * Admin Home Page
      */
     public function adminHome(): View
     {
@@ -38,38 +34,35 @@ class HomeController extends Controller
     }
 
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * Manager Home Page
      */
     public function managerHome(): View
     {
         return view('managerHome');
     }
 
-    public function dashboard()
-{
-    return view('adminHome');
+    public function dashboard(): View
+    {
+        return view('adminHome');
+    }
 
-}
+    public function inventory(): View
+    {
+        return view('inventory');
+    }
 
-public function inventory()
-{
-    return view('inventory');
-}
+    public function orders(): View
+    {
+        return view('order');
+    }
 
-public function orders()
-{
-    return view('order');
-}
+    public function delivery(): View
+    {
+        return view('delivery');
+    }
 
-public function delivery()
-{
-    return view('delivery');
-}
-
-public function promotions()
-{
-    return view('promotions');
-}
+    public function promotions(): View
+    {
+        return view('promotions');
+    }
 }

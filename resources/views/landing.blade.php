@@ -22,7 +22,7 @@
                     <li><a href="/">HOME</a></li>
                     <li><a href="#">MENU</a></li>
                     <li><a href="#">CONTACT</a></li>
-                    <li><a href="/login">SERVICES PROVIDED</a></li>
+                    <li><a href="layouts/Login">SERVICES PROVIDED</a></li>
                 </ul>
             </nav>
 

@@ -9,17 +9,21 @@ class Products extends Model
 {
     use HasFactory;
 
-    // Define the table name (optional if it follows the convention)
     protected $table = 'products';
 
-    // If you don't want timestamps
-    public $timestamps = false;
-
-    // The fields that are mass assignable
     protected $fillable = [
+        'product_id',
         'product_name',
         'category',
-        'price',
-        'availability'
+        'price_hot',
+        'price_iced',
+        'availability',
+        'tag',
+        'image', // Include 'image' if you upload images
     ];
+    public function index()
+{
+    $products = Products ::where('status', 'active')->get(); // Or any condition you want
+    return view('home', compact('products'));
+}
 }

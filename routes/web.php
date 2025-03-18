@@ -7,6 +7,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\InventoryController;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use App\Http\Controllers\BillingController;
 
 
 //------------------------------------------SA ADMIN INI------------------------------------------
@@ -23,7 +24,9 @@ Route::get('/register', function () {
 Route::get('/', function () {
     return view('landing');
 });
-
+Route::get('/inventory', function () {
+    return view('inventory');
+})->name('inventory');
 // Order Page (Optional: You can remove this if not needed)
 Route::get('/order', function () {
     return view('order');
@@ -35,7 +38,7 @@ Auth::routes();
 | Routes for Normal Users
 -------------------------------------------*/
 Route::middleware(['auth', 'user-access:user'])->group(function () {
-    Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::get('/home', [ProductController::class, 'home'])->name('home');
 });
 /*------------------------------------------
 | Routes for Admin
@@ -84,31 +87,28 @@ Route::get('/search-products', [ProductController::class, 'search'])->name('inve
 Route::post('/add-product', [ProductController::class, 'store'])->name('products.store');
 
 // CRUD Routes
-Route::put('/products/{id}', [ProductController::class, 'update']);
-Route::delete('/products/{id}', [ProductController::class, 'destroy']);
-Route::delete('/products/{id}', [ProductController::class, 'create']);
-Route::resource('products', ProductController::class);
-Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
 
-//search ini
-Route::get('/search-products', [ProductController::class, 'search'])->name('products.search');
-Route::get('/search', [ProductController::class, 'searchProducts'])->name('products.search');
+
+Route::get('/inventory', [ProductController::class, 'index'])->name('inventory');
+Route::get('/products', [ProductController::class, 'getProducts'])->name('products.json');
+Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
+Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
+Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
+Route::get('/products/{id}/check', [ProductController::class, 'checkProduct'])->name('products.check');
+Route::get('/products/{id}/billing', [ProductController::class, 'billingPage'])->name('products.billing');
+Route::get('/products/ajax/search', [ProductController::class, 'searchProducts'])->name('products.ajax.search');
 
 //------------------------------------------SA USER INI------------------------------------------
-Route::get('/home', function () {
-    return view('home');
-})->name('home');
-Route::get('/user_desktop', function () {
-    return view('user_desktop');
-})->name('user_desktop');
+Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 Route::get('/deliveryuser', function (): Factory|View {
     return view('deliveryuser');
 })->name('deliveryuser');
 
 Route::get('/logout', function () {
-    return view('logout');
-})->name('logout');
+    return view('landing');
+})->name('landing');
 
 Route::get('/account_settings', function () {
     return view('account_settings');
@@ -118,3 +118,8 @@ Route::get('/account_settings', function () {
 //buy now
 Route::get('/check-product/{id}', [ProductController::class, 'checkProduct']);
 Route::get('/billing/{id}', [ProductController::class, 'billingPage']); // Example route for billing page
+//pag fetch ki prodcut
+Route::get('/products/{id}', [ProductController::class, 'show'])->name('product.show');
+Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+
+

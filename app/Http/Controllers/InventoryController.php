@@ -23,9 +23,9 @@ class InventoryController extends Controller
             'price'       => 'required|numeric',
             'availability'=> 'required|string'
         ]);
-    
+
         $product = Products::create($validated);
-    
+
         return response()->json([
             'message' => 'Product added successfully!',
             'product' => $product
@@ -36,7 +36,7 @@ class InventoryController extends Controller
     public function edit($id)
     {
         $product = Products::findOrFail($id);
-        return view('inventory.edit', compact('product'));
+        return view('inventory', compact('product'));
     }
 
     // Process the edit form and update product
@@ -52,31 +52,31 @@ class InventoryController extends Controller
 $product = Products::findOrFail($id);
 $product->update($validated);
 
-    
+
         $product->update([
             'product_name' => $request->input('product_name'),
             'category' => $request->input('category'),
             'price' => $request->input('price'),
             'availability' => $request->input('availability'),
         ]);
-    
+
         // Return JSON response
         return response()->json([
             'message' => 'Product updated successfully!',
             'product' => $product
         ]);
     }
-    
+
 
     // Delete product
     public function destroy($id)
     {
         $product = Products::findOrFail($id);
         $product->delete();
-    
+
         return response()->json([
             'message' => 'Product deleted successfully!'
         ]);
     }
-    
+
 }
