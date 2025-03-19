@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Laravel Frontend</title>
+    <title>Beyouu Brew Cafe</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -109,20 +109,22 @@
                 class="absolute inset-0 w-full h-full object-cover hidden rounded-xl" alt="Slideshow 2">
         </div>
 
-        <!-- Category Section -->
-        <div class="mb-8">
-            <h2 class="text-xl font-bold mb-4">Choose Your Category</h2>
-            <div class="flex flex-wrap gap-4">
-                <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white"
-                    data-category="all">All</button>
-                <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white"
-                    data-category="coffee">Coffee</button>
-                <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white"
-                    data-category="non-coffee">Non-Coffee</button>
-                <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white"
-                    data-category="best-seller">Best Seller</button>
-            </div>
+      <!-- Category Section -->
+      <div class="mb-8">
+        <h2 class="text-xl font-bold mb-4">Choose Your Category</h2>
+        <div class="flex flex-wrap gap-4">
+            <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white"
+                data-category="all">All</button>
+            <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white"
+                data-category="coffee series">Coffee Series</button>
+            <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white"
+                data-category="non-coffee series">Non-Coffee Series</button>
+            <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white"
+                data-category="best seller">Best Seller</button>
         </div>
+    </div>
+
+
 
 
             <!-- Product List -->
@@ -223,52 +225,46 @@
     </div>
 
     <!-- Mode of Order -->
-    <div class="mt-6">
-        <label class="block font-bold mb-2">Mode of Order</label>
-        <select id="orderMode" class="w-full p-2 border rounded bg-white text-black text-center appearance-none">
-            <option value="delivery">🚚 Delivery</option>
-            <option value="pickup">🏠 Pick Up</option>
-        </select>
-        <button id="locationBtn" class="w-full mt-2 p-2 bg-white text-black border rounded">Enter Your Location</button>
+<div class="mt-6">
+    <label class="block font-bold mb-2">Mode of Order</label>
+    <select id="orderMode" class="w-full p-2 border rounded bg-white text-black text-center appearance-none">
+        <option value="delivery">🚚 Delivery</option>
+        <option value="pickup">🏠 Pick Up</option>
+    </select>
+    <button id="locationBtn" class="w-full mt-2 p-2 bg-white text-black border rounded">Enter Your Location</button>
+</div>
+
+<!-- Payment Method -->
+<div class="mt-6">
+    <label class="block font-bold mb-2">Payment Method</label>
+    <div class="flex justify-between mt-2">
+        <button class="payment-btn w-1/2 p-2 bg-white text-black border border-gray-500 rounded hover:bg-[#745858] hover:text-white" data-method="Gcash">Gcash</button>
+        <button class="payment-btn w-1/2 p-2 bg-white text-black border border-gray-500 rounded hover:bg-[#745858] hover:text-white ml-2" data-method="Cash">Cash</button>
     </div>
+</div>
 
-    <!-- Payment Method -->
-    <div class="mt-6">
-        <label class="block font-bold mb-2">Payment Method</label>
-        <div class="flex justify-between mt-2">
-            <button class="w-1/2 p-2 bg-white text-black border border-gray-500 rounded hover:bg-[#745858] hover:text-white">Gcash</button>
-            <button class="w-1/2 p-2 bg-white text-black border border-gray-500 rounded hover:bg-[#745858] hover:text-white ml-2">Cash</button>
-        </div>
-    </div>
-
-    <!-- Place Order Button -->
-    <button class="w-full mt-7 p-2 bg-[#745858] text-white rounded hover:bg-[#553C26]">Place Order</button>
-</aside>
+<!-- Place Order Button -->
+<button id="placeOrderBtn" class="w-full mt-7 p-2 bg-[#745858] text-white rounded hover:bg-[#553C26]">Place Order</button>
 
 
 
-    <script>
-       document.getElementById('billingBtn').addEventListener('click', function(event) {
+<script>
+    // Open/Close Billing Sidebar
+    document.getElementById('billingBtn').addEventListener('click', function (event) {
         event.preventDefault();
         document.getElementById('rightSidebar').classList.remove('translate-x-full');
     });
 
-    document.getElementById('closeSidebar').addEventListener('click', function() {
+    document.getElementById('closeSidebar').addEventListener('click', function () {
         document.getElementById('rightSidebar').classList.add('translate-x-full');
     });
 
-    document.getElementById('userMenuBtn').addEventListener('click', function() {
+    // Toggle User Menu
+    document.getElementById('userMenuBtn').addEventListener('click', function () {
         document.getElementById('userMenu').classList.toggle('hidden');
     });
 
-    function searchProducts(query) {
-        fetch(`/search-products?query=${query}`)
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-            });
-    }
-
+    // Slideshow
     let slides = document.querySelectorAll('.w-full.h-64.overflow-hidden.relative img');
     let index = 0;
     setInterval(() => {
@@ -277,12 +273,14 @@
         slides[index].classList.remove('hidden');
     }, 2000);
 
+    // Mode of Order
     document.getElementById("orderMode").addEventListener("change", function () {
         let locationBtn = document.getElementById("locationBtn");
         locationBtn.textContent = this.value === "pickup" ? "Current Location" : "Enter Your Location";
     });
 
-    document.getElementById('favoriteBtn').addEventListener('click', function() {
+    // Favorite Button
+    document.getElementById('favoriteBtn').addEventListener('click', function () {
         let heartIcon = document.getElementById('heartIcon');
         if (heartIcon.classList.contains('text-gray-500')) {
             heartIcon.classList.remove('text-gray-500');
@@ -295,6 +293,7 @@
         }
     });
 
+    // Quantity Controls
     document.addEventListener("DOMContentLoaded", function () {
         const quantityDisplay = document.getElementById("quantity");
         const increaseBtn = document.getElementById("increaseBtn");
@@ -302,109 +301,56 @@
 
         let quantity = 1;
 
-        increaseBtn.addEventListener("click", function () {
-            quantity++;
-            quantityDisplay.textContent = quantity;
-        });
-
-        decreaseBtn.addEventListener("click", function () {
-            if (quantity > 1) {
-                quantity--;
+        if (increaseBtn) {
+            increaseBtn.addEventListener("click", function () {
+                quantity++;
                 quantityDisplay.textContent = quantity;
-            }
-        });
-    });
-
-    document.addEventListener("DOMContentLoaded", function () {
-        const productContainer = document.getElementById("productContainer");
-        const categoryButtons = document.querySelectorAll(".category-btn");
-
-        function displayProducts(category) {
-            productContainer.innerHTML = "";
-            const selectedProducts = products[category] || [];
-            selectedProducts.forEach((product) => {
-                const productHTML = `
-                    <div class="bg-white p-3 rounded shadow-md">
-                        <img src="${product.img}" class="w-full h-40 object-cover rounded" alt="Product">
-                        <button class="w-full mt-2 p-2 bg-[#EADBC8] text-black rounded hover:bg-[#745858] hover:text-white">Add to Cart</button>
-                    </div>
-                `;
-                productContainer.innerHTML += productHTML;
             });
         }
 
-        displayProducts("all");
-
-        categoryButtons.forEach((btn) => {
-            btn.addEventListener("click", function () {
-                const category = this.getAttribute("data-category");
-                displayProducts(category);
+        if (decreaseBtn) {
+            decreaseBtn.addEventListener("click", function () {
+                if (quantity > 1) {
+                    quantity--;
+                    quantityDisplay.textContent = quantity;
+                }
             });
-        });
-    });
-
-    function addToCart(productName) {
-        alert(productName + " has been added to the cart!");
-    }
-
-    function buyNow(productName) {
-        alert("Proceeding to checkout for " + productName);
-    }
-
-    function selectSize(index, size) {
-        document.querySelectorAll(`.size-btn[data-index='${index}']`).forEach(btn => {
-            btn.classList.remove('bg-[#A07D68]', 'text-white');
-        });
-        document.querySelector(`.size-btn[data-index='${index}'][data-size='${size}']`).classList.add('bg-[#A07D68]', 'text-white');
-    }
-
-    function selectMood(index, mood) {
-        document.querySelectorAll(`.mood-btn[data-index='${index}']`).forEach(btn => {
-            btn.classList.remove('bg-[#FF5733]', 'text-white');
-        });
-        document.querySelector(`.mood-btn[data-index='${index}'][data-mood='${mood}']`).classList.add('bg-[#6A4028]', 'text-white');
-    }
-
-    function updateQuantity(index, change) {
-        let quantityElem = document.getElementById(`quantity${index}`);
-        let currentQuantity = parseInt(quantityElem.innerText);
-        let newQuantity = currentQuantity + change;
-        if (newQuantity >= 1) {
-            quantityElem.innerText = newQuantity;
         }
-    }
-
-    function addToCart(productName) {
-        alert(`${productName} added to cart!`);
-    }
-
-    function buyNow(productName) {
-        alert(`Proceeding to checkout for ${productName}!`);
-    }
-
-    // BEST SELLER FILTER
-    document.addEventListener("DOMContentLoaded", function () {
-        const categoryButtons = document.querySelectorAll(".category-btn");
-        const productItems = document.querySelectorAll(".product-item");
-
-        categoryButtons.forEach((button) => {
-            button.addEventListener("click", function () {
-                const selectedCategory = this.getAttribute("data-category");
-
-                productItems.forEach((item) => {
-                    const itemCategories = item.getAttribute("data-category").split(" ");
-                    if (selectedCategory === "all" || itemCategories.includes(selectedCategory)) {
-                        item.style.display = "flex";
-                    } else {
-                        item.style.display = "none";
-                    }
-                });
-            });
-        });
     });
 
-    // ✅ MODIFIED BILLING CART SECTION STARTS HERE
+    // ✅ CATEGORY FILTER FUNCTION
+    document.addEventListener("DOMContentLoaded", function () {
+    const categoryButtons = document.querySelectorAll('.category-btn');
+    const productItems = document.querySelectorAll('.product-item');
 
+    if (!categoryButtons.length || !productItems.length) {
+        console.warn("No categories or products found!");
+        return;
+    }
+
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const selectedCategory = this.getAttribute('data-category').toLowerCase();
+
+            productItems.forEach(item => {
+                const itemCategories = item.getAttribute('data-category').toLowerCase().split(" ");
+
+                if (selectedCategory === 'all' || itemCategories.includes(selectedCategory)) {
+                    item.style.display = 'flex'; // 'flex' or 'block' depending on your layout
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Highlight the active button
+            categoryButtons.forEach(btn => btn.classList.remove('bg-[#745858]', 'text-white'));
+            this.classList.add('bg-[#745858]', 'text-white');
+        });
+    });
+});
+
+
+    // ✅ BILLING CART FUNCTIONS
     function addToBillingCart(productName, priceHot, priceCold) {
         const selectedOption = priceHot > 0 ? "Hot" : "Cold";
         const selectedPrice = priceHot > 0 ? priceHot : priceCold;
@@ -420,7 +366,6 @@
                         <img src="{{ asset('images/close.png') }}" alt="Remove Item" class="w-5 h-5">
                     </button>
                 </div>
-
                 <div class="flex justify-between items-center mt-2">
                     <div class="flex items-center space-x-2">
                         <button class="bg-gray-300 px-2 py-1 rounded" onclick="changeQuantity(this, -1)">-</button>
@@ -468,9 +413,43 @@
         document.getElementById('totalAmount').textContent = `₱ ${total.toFixed(2)}`;
     }
 
+    // ✅ SEARCH FUNCTION FOR PRODUCTS
+    function searchProducts(query) {
+        query = query.trim().toLowerCase();
 
+        const productItems = document.querySelectorAll('.product-item');
 
+        let found = false;
 
-    </script>
+        productItems.forEach(item => {
+            const productName = item.querySelector('h3').innerText.toLowerCase();
+
+            if (productName.includes(query)) {
+                item.style.display = "flex";
+                found = true;
+            } else {
+                item.style.display = "none";
+            }
+        });
+
+        // If no products match
+        const noResultMessage = document.getElementById('noResultMessage');
+        if (!found) {
+            if (!noResultMessage) {
+                const message = document.createElement('p');
+                message.id = 'noResultMessage';
+                message.className = 'text-center text-gray-600 mt-4';
+                message.innerText = 'No products found.';
+                document.getElementById('productContainer').appendChild(message);
+            }
+        } else {
+            if (noResultMessage) {
+                noResultMessage.remove();
+            }
+        }
+    }
+
+</script>
+
 </body>
 </html>
