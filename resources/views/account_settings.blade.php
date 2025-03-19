@@ -17,7 +17,7 @@
             <nav>
                 <ul>
                     <li class="mb-4">
-                        <a href="{{ route('user_desktop') }}" class="flex flex-col items-center p-3 hover:bg-[#745858] hover:text-white rounded group">
+                        <a href="{{ route('home') }}" class="flex flex-col items-center p-3 hover:bg-[#745858] hover:text-white rounded group">
                             <img src="{{ asset('images/home.png') }}" alt="Home Icon" class="w-9 h-9 mb-1 group-hover:hidden">
                             <img src="{{ asset('images/home_white.png') }}" alt="Home Icon Hover" class="w-9 h-9 mb-1 hidden group-hover:block">
                             <span>Home</span>
@@ -72,7 +72,7 @@
 
     <!-- Main Content -->
     <main class="w-full max-w-7xl bg-white p-6 rounded-lg shadow-lg mt-6">
-        
+
         <!-- Personal Information (Default Visible) -->
         <section id="personal-info" class="settings-tab w-full max-w-7xl mx-auto">
             <h2 class="text-3xl font-bold text-[#4E3629] mb-6">Personal Information</h2>
@@ -89,11 +89,13 @@
                 <!-- Information Fields -->
                 <div class="w-full">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="first-name" class="input-label block">First Name</label>
-                            <input type="text" id="first-name" class="input-box w-full" placeholder="Enter your first name"
-                                style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
-                        </div>
+<!-- First Name Box -->
+<div>
+    <label for="first-name" class="input-label block mb-1">First Name</label>
+    <p class="block w-full p-2 border-2 border-[#6A4028] rounded bg-gray-100 text-[#4E3629] cursor-default select-none">
+        {{ Auth::user()->name }}
+    </p>
+</div>
                         <div>
                             <label for="last-name" class="input-label block">Last Name</label>
                             <input type="text" id="last-name" class="input-box w-full" placeholder="Enter your last name"
@@ -313,7 +315,7 @@
     <!-- Place Order Button -->
     <button class="w-full mt-7 p-2 bg-[#745858] text-white rounded">Place Order</button>
 </aside>
-    
+
     <script>
         document.getElementById('billingBtn').addEventListener('click', function(event) {
             event.preventDefault();
@@ -325,7 +327,7 @@
         document.getElementById('userMenuBtn').addEventListener('click', function() {
             document.getElementById('userMenu').classList.toggle('hidden');
         });
-        
+
         // Slideshow Functionality
         let slides = document.querySelectorAll('.w-full.h-64.overflow-hidden.relative img');
         let index = 0;

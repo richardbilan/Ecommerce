@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beyouu Brew Cafe</title>
+    <title>Beyouu Brew Cafeph</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -82,7 +82,7 @@
 
         <!-- Header -->
         <header class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold">Welcome, User!</h1>
+            <h1 class="text-2xl font-bold">Welcome, {{ Auth::user()->name }}!</h1>
 
             <div class="relative">
                 <form role="search">
@@ -114,11 +114,14 @@
         <h2 class="text-xl font-bold mb-4">Choose Your Category</h2>
         <div class="flex flex-wrap gap-4">
             <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white"
-                data-category="all">All</button>
-            <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white"
-                data-category="coffee series">Coffee Series</button>
-            <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white"
-                data-category="non-coffee series">Non-Coffee Series</button>
+            data-category="all">All</button>
+
+        <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white"
+            data-category="coffee series">Coffee Series</button>
+
+        <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white"
+            data-category="non-coffee series">Non-Coffee Series</button>
+
             <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white"
                 data-category="best seller">Best Seller</button>
         </div>
@@ -136,9 +139,9 @@
         @if ($products && count($products) > 0)
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach ($products as $product)
-                <div
-                    class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 product-item"
-                    data-category="{{ strtolower($product->category) }}">
+            <div
+            class="product-item flex bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+            data-category="{{ strtolower($product->category) }}">
 
                     <!-- Product Image -->
                     <img src="{{ asset('images/' . ($product->image ?? 'cup.png')) }}" alt="{{ $product->product_name }}"
@@ -333,10 +336,10 @@
             const selectedCategory = this.getAttribute('data-category').toLowerCase();
 
             productItems.forEach(item => {
-                const itemCategories = item.getAttribute('data-category').toLowerCase().split(" ");
+                const itemCategory = item.getAttribute('data-category').toLowerCase();
 
-                if (selectedCategory === 'all' || itemCategories.includes(selectedCategory)) {
-                    item.style.display = 'flex'; // 'flex' or 'block' depending on your layout
+                if (selectedCategory === 'all' || itemCategory === selectedCategory) {
+                    item.style.display = 'block'; // or 'flex' depending on your CSS layout
                 } else {
                     item.style.display = 'none';
                 }
@@ -348,6 +351,7 @@
         });
     });
 });
+
 
 
     // ✅ BILLING CART FUNCTIONS

@@ -123,3 +123,4 @@ Route::get('/products/{id}', [ProductController::class, 'show'])->name('product.
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 
 
+Route::put('/account/update', [AccountController::class, 'update'])->name('account.update');
