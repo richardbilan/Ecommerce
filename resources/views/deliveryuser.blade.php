@@ -58,14 +58,29 @@
   </aside>
 
   <!-- Main Content -->
-  <main class="flex-1 p-6">
-    <h1 class="text-2xl font-bold">Your Delivery, User!</h1>
+  <!-- Main Content -->
+<main class="flex-1 p-6">
+    <h1 class="text-2xl font-bold">Your Delivery, {{ Auth::user()->name }}</h1>
 
-    <div class="mt-4 flex gap-6">
-      <div class="w-3/4">
-        <img src="{{ asset('images/valid-image.jpg') }}" alt="Map" class="w-full h-[500px] rounded-lg object-cover">
-        <button class="mt-2 px-4 py-2 border rounded hover:bg-gray-200">View Location</button>
+    <!-- Flex container for Map and Track Order -->
+    <div class="mt-4 flex flex-col lg:flex-row gap-6">
+      <!-- Map Section -->
+      <div class="w-full lg:w-3/4">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.393857019527!2d106.6645315748183!3d10.77978385905508!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752ee0b13dd1f5%3A0xa7a2e93e93a1732!2zMTEzIMSQLiBUcuG7jW5nIEjGsG5nIFF1w70sIFBoxrDhu51uZyA1LCBRdeG6o25nIDMsIFRow6BuaCBwaOG7kSBIw6AgQ2jDrSBNaW5o!5e0!3m2!1sen!2s!4v1710916477821!5m2!1sen!2s"
+          width="100%"
+          height="500"
+          style="border:0; border-radius: 0.5rem;"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
 
+        <button class="mt-2 px-4 py-2 border rounded hover:bg-gray-200" onclick="window.open('https://maps.app.goo.gl/NxvjoxKkvBpwCngK6', '_blank')">
+          View Location
+        </button>
+
+        <!-- Delivery Time, Location Details, and Receipt -->
         <div class="mt-4 p-4 border rounded-lg shadow-sm">
           <h2 class="text-lg font-semibold">Estimated Delivery Time</h2>
           <p>10 - 15 minutes</p>
@@ -82,7 +97,8 @@
         </div>
       </div>
 
-      <div class="w-1/3 bg-[#D7B899] p-4 rounded-lg shadow-md">
+      <!-- Track Order Section -->
+      <div class="w-full lg:w-1/3 bg-[#D7B899] p-4 rounded-lg shadow-md h-fit">
         <h2 class="text-lg font-semibold">Track Order</h2>
         <div class="mt-2 space-y-4 border-l-2 border-gray-600 pl-4">
           <div class="p-3 bg-white border rounded-lg shadow-sm">
@@ -132,77 +148,7 @@
     </div>
   </div>
 
-  <!-- Right Sidebar (Billing) -->
-  <aside id="rightSidebar" class="fixed right-0 top-0 w-80 bg-[#EADBC8] h-full shadow-lg transform translate-x-full transition-transform duration-300 p-4">
-    <button id="closeSidebar" class="mb-4" onclick="toggleSidebar(false)">
-      <img src="{{ asset('images/close.png') }}" alt="Close Icon" class="w-6 h-6">
-    </button>
-    <h2 class="text-xl font-bold mb-4">Billings</h2>
 
-    <div id="cartItems" class="space-y-4">
-      <div class="bg-white p-3 rounded shadow-md">
-        <div class="flex justify-between items-center">
-          <div>
-            <h3 class="font-semibold">Americano <span class="text-sm text-gray-500">(Cold, Tall)</span></h3>
-            <p class="text-sm">₱ 28</p>
-          </div>
-          <button>
-            <img src="{{ asset('images/close.png') }}" alt="Remove Item" class="w-5 h-5">
-          </button>
-        </div>
-
-        <div class="flex justify-between items-center mt-2">
-          <button id="favoriteBtn" class="text-gray-500 transition-colors duration-300">
-            <svg id="heartIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21l-1.45-1.316C5.4 15.36 2 12.28 2 8.5
-                      2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3
-                      19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.184L12 21z" />
-            </svg>
-          </button>
-
-          <div class="flex items-center space-x-2">
-            <button id="decreaseBtn" class="bg-gray-300 px-2 py-1 rounded">-</button>
-            <span id="quantity" class="w-6 text-center">1</span>
-            <button id="increaseBtn" class="bg-gray-300 px-2 py-1 rounded">+</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="mt-2 border-t pt-2">
-      <div class="flex justify-between">
-        <span>Delivery Fee</span>
-        <span>₱ 888</span>
-      </div>
-      <div class="flex justify-between">
-        <span>Promo</span>
-        <span>₱ 28</span>
-      </div>
-      <div class="flex justify-between font-bold border-t mt-2 pt-2">
-        <span>Total</span>
-        <span>₱ 28</span>
-      </div>
-    </div>
-
-    <div class="mt-6">
-      <label class="block font-bold">Mode of order</label>
-      <select id="orderMode" class="w-full p-2 border rounded bg-white text-black text-center appearance-none">
-        <option value="delivery">🚚 Delivery</option>
-        <option value="pickup">🏠 Pick Up</option>
-      </select>
-      <button id="locationBtn" class="w-full mt-2 p-2 bg-white text-black border rounded">Enter Your Location</button>
-    </div>
-
-    <div class="mt-6">
-      <label class="block font-bold">Payment Method</label>
-      <div class="flex justify-between mt-2">
-        <button class="w-1/2 p-2 bg-white text-black border border-gray-500 rounded hover:bg-[#745858] hover:text-white">Gcash</button>
-        <button class="w-1/2 p-2 bg-white text-black border border-gray-500 rounded ml-2 hover:bg-[#745858] hover:text-white">Cash</button>
-      </div>
-    </div>
-
-    <button class="w-full mt-7 p-2 bg-[#745858] text-white rounded">Place Order</button>
-  </aside>
 
   <!-- Scripts -->
   <script>

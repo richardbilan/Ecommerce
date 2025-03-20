@@ -7,19 +7,19 @@
 <link rel="stylesheet" href="{{ asset('css/style_order.css') }}">
 
 @section('content')
-<h1> ORDER MANAGEMENT</h1>
+<h1>ORDER MANAGEMENT</h1>
 
 <div class="order-container">
-    <!-- Top Bar: Search Bar + Shop Status -->
+    <!-- Top Bar: Search Bar -->
     <div class="top-bar">
-        </div>
         <div class="search-container">
             <input type="text" id="search" placeholder="Search product...">
             <i class="fas fa-search"></i>
         </div>
     </div>
 
-    <!-- order Table -->
+    <!-- Order Table -->
+    <h2>Order List</h2>
     <div class="order-list">
         <table>
             <thead>
@@ -31,8 +31,16 @@
                     <th>Date</th>
                 </tr>
             </thead>
-        <h2>Order List</h2>
-        <table>
+            <tbody>
+                <!-- Dynamic rows will go here -->
+                <tr>
+                    <td>#001</td>
+                    <td>John Doe</td>
+                    <td>123 Main Street</td>
+                    <td>Delivered</td>
+                    <td>2024-03-19</td>
+                </tr>
+            </tbody>
         </table>
     </div>
 </div>

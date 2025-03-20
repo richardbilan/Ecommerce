@@ -6,9 +6,27 @@ h1 {
 /* Inventory Container */
 
 .inventory-container {
+    margin-left: 20px;
+    margin-top: 20px;
     padding: 20px;
-    font-family: Arial, sans-serif;
-    width: 100%;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    width: auto;
+}
+
+
+/* Order Container */
+
+.order-container {
+    margin-left: 50px;
+    /* Increased from 20px to 50px */
+    margin-top: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    width: auto;
 }
 
 

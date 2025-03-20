@@ -87,7 +87,7 @@
         @endauth
 
         @guest
-            <h1>Welcome, Guest!</h1>
+            <h1>Welcome, {{ Auth::user()->name }}</h1>
         @endguest
         <div class="flex justify-between items-center mb-6">
            <!-- Search Form -->
@@ -193,22 +193,33 @@
 
                    <!-- Pricing Buttons -->
 <div class="text-sm text-gray-700 mb-4 flex gap-2">
+  <!-- Hot Button -->
+  <button
+    onclick="addToBillingCart(
+      '{{ $product->product_name }}',
+      'Hot',
+      '{{ $product->price_hot ?? 0 }}'
+    )"
+    class="bg-[#745858] text-white hover:bg-[#5a4444] transition-all duration-300 w-[92px] h-[26px] rounded-[20px] text-sm flex items-center justify-center"
+    type="button"
+    @if (($product->price_hot ?? 0) <= 0) disabled @endif
+  >
+    Hot: {{ ($product->price_hot ?? 0) > 0 ? '₱' . number_format($product->price_hot, 2) : 'N/A' }}
+  </button>
 
-    <!-- Hot Button -->
-    <button
-        class="bg-[#745858] text-white hover:bg-[#5a4444] transition-all duration-300 w-[92px] h-[26px] rounded-[20px] text-sm flex items-center justify-center"
-        type="button"
-    >
-        Hot: {{ ($product->price_hot ?? 0) > 0 ? '₱' . number_format($product->price_hot, 2) : 'N/A' }}
-    </button>
-
-    <!-- Iced Button -->
-    <button
-        class="bg-[#745858] text-white hover:bg-[#5a4444] transition-all duration-300 w-[92px] h-[26px] rounded-[20px] text-sm flex items-center justify-center"
-        type="button"
-    >
-        Iced: {{ ($product->price_iced ?? 0) > 0 ? '₱' . number_format($product->price_iced, 2) : 'N/A' }}
-    </button>
+  <!-- Iced Button -->
+  <button
+    onclick="addToBillingCart(
+      '{{ $product->product_name }}',
+      'Iced',
+      '{{ $product->price_iced ?? 0 }}'
+    )"
+    class="bg-[#745858] text-white hover:bg-[#5a4444] transition-all duration-300 w-[92px] h-[26px] rounded-[20px] text-sm flex items-center justify-center"
+    type="button"
+    @if (($product->price_iced ?? 0) <= 0) disabled @endif
+  >
+    Iced: {{ ($product->price_iced ?? 0) > 0 ? '₱' . number_format($product->price_iced, 2) : 'N/A' }}
+  </button>
 </div>
 
                     <!-- Add to Cart Button -->

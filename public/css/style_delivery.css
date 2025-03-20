@@ -1,5 +1,5 @@
-
 /* Content Layout */
+
 .content {
     flex: 1;
     padding: 20px;
@@ -17,17 +17,22 @@
     padding: 20px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     margin-left: 20px;
-    font-size: 14px; /* Default font size for titles */
+    font-size: 14px;
+    /* Default font size for titles */
 }
 
 .card span {
     display: block;
-    font-size: 24px; /* Make values larger */
+    font-size: 24px;
+    /* Make values larger */
     font-weight: bold;
-    margin-top: 5px; /* Add spacing */
+    margin-top: 5px;
+    /* Add spacing */
 }
 
+
 /* Inventory List - Full Width */
+
 .inventory-list {
     margin-left: 20px;
     margin-top: 20px;
@@ -44,7 +49,9 @@
     align-items: center;
 }
 
+
 /* Search Bar */
+
 .search-container {
     display: flex;
     align-items: center;
@@ -65,14 +72,17 @@
     color: gray;
 }
 
+
 /* Table */
+
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
 }
 
-th, td {
+th,
+td {
     padding: 10px;
     border-bottom: 1px solid #ddd;
     text-align: left;

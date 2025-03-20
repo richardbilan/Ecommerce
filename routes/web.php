@@ -91,3 +91,10 @@ Route::get('/deliveryuser', function () {
 })->name('deliveryuser');
 
 Route::get('/search', [ProductController::class, 'search'])->name('products.search');
+
+
+//inventory routes
+// Example for web.php (for a standard form submission)
+Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+
+Route::view('/deliveryuser', 'deliveryuser')->name('deliveryuser');

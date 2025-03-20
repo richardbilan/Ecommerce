@@ -374,7 +374,18 @@ $(document).ready(function() {
     });
 });
 
+const toggleShop = document.getElementById('toggleShop');
+const statusLabel = document.getElementById('statusLabel');
 
+toggleShop.addEventListener('change', function () {
+    if (toggleShop.checked) {
+        statusLabel.textContent = 'OPEN';
+        statusLabel.style.color = 'green';
+    } else {
+        statusLabel.textContent = 'CLOSED';
+        statusLabel.style.color = 'red';
+    }
+});
 
 </script>
 
