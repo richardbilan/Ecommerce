@@ -29,7 +29,7 @@ class CreateUsersSeeder extends Seeder
                 'password' => Hash::make('123456'),
             ],
             [
-                'name' => 'User',
+                'name' => 'Richard',
                 'email' => 'richard@user.com',
                 'type' => 0,
                 'password' => Hash::make('123456'),

@@ -82,115 +82,137 @@
 
         <!-- Header -->
         <header class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold">Welcome, {{ Auth::user()->name }}!</h1>
+            @auth
+            <h1 class="text-2xl font-bold">Welcome, {{ Auth::user()->name }}</span>!</h1>
+        @endauth
 
-            <div class="relative">
-                <form role="search">
-                    <div class="relative">
-                        <input type="search" name="search" placeholder="Search Coffee..."
-                            class="p-2 border border-[#745858] rounded w-64 bg-[#EADBC8] text-black"
-                            oninput="searchProducts(this.value)">
-                        <button type="submit" class="absolute right-3 top-2">
-                            <img src="{{ asset('images/search.png') }}" alt="Search Icon"
-                                class="w-5 h-5 group-hover:hidden">
-                            <img src="{{ asset('images/search_black.png') }}" alt="Search Icon Hover"
-                                class="w-5 h-5 hidden group-hover:block">
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </header>
+        @guest
+            <h1>Welcome, Guest!</h1>
+        @endguest
+        <div class="flex justify-between items-center mb-6">
 
-        <!-- Slideshow -->
-        <div class="w-full h-64 overflow-hidden relative rounded-xl mb-8">
-            <img src="{{ asset('images/image1.jpeg') }}"
-                class="absolute inset-0 w-full h-full object-cover rounded-xl" alt="Slideshow 1">
-            <img src="{{ asset('images/image2.jpeg') }}"
-                class="absolute inset-0 w-full h-full object-cover hidden rounded-xl" alt="Slideshow 2">
-        </div>
+            <!-- Search Form -->
+           <!-- Search Form -->
+<form role="search" onsubmit="return false;">
+    <div class="relative">
+        <input
+            type="search"
+            name="search"
+            placeholder="Search Coffee..."
+            class="p-2 border border-[#745858] rounded w-64 bg-[#EADBC8] text-black"
+            oninput="searchProducts(this.value)"
+        >
 
-      <!-- Category Section -->
-      <div class="mb-8">
-        <h2 class="text-xl font-bold mb-4">Choose Your Category</h2>
-        <div class="flex flex-wrap gap-4">
-            <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white"
-            data-category="all">All</button>
-
-        <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white"
-            data-category="coffee series">Coffee Series</button>
-
-        <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white"
-            data-category="non-coffee series">Non-Coffee Series</button>
-
-            <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white"
-                data-category="best seller">Best Seller</button>
-        </div>
+        <button type="submit" class="absolute right-3 top-2">
+            <img src="{{ asset('images/search.png') }}" alt="Search Icon" class="w-5 h-5 group-hover:hidden">
+            <img src="{{ asset('images/search_black.png') }}" alt="Search Icon Hover" class="w-5 h-5 hidden group-hover:block">
+        </button>
     </div>
+</form>
 
+</div>
+</header>
 
+<!-- Slideshow -->
+<div class="w-full h-64 overflow-hidden relative rounded-xl mb-8">
+    <img src="{{ asset('images/image1.jpeg') }}"
+        class="absolute inset-0 w-full h-full object-cover rounded-xl" alt="Slideshow 1">
+    <img src="{{ asset('images/image2.jpeg') }}"
+        class="absolute inset-0 w-full h-full object-cover hidden rounded-xl" alt="Slideshow 2">
+</div>
 
+<!-- Category Section -->
+<div class="mb-8">
+    <h2 class="text-xl font-bold mb-4">Choose Your Category</h2>
+    <div class="flex flex-wrap gap-4">
+        <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white" data-category="all">All</button>
+        <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white" data-category="coffee series">Coffee Series</button>
+        <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white" data-category="non-coffee series">Non-Coffee Series</button>
+        <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white" data-category="best seller">Best Seller</button>
+    </div>
+</div>
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <h2 class="text-2xl font-bold mb-6">Choose Menu</h2>
 
-            <!-- Product List -->
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">Choose Menu</h2>
+    <!-- Grid layout for the menu items -->
+    <div id="productContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+        @foreach ($products as $product)
+        <!-- Product Card -->
+        <div class="product-item bg-[#F5F5F5] p-6 rounded-xl shadow-md flex flex-col" data-category="{{ strtolower($product->category) }}">
+            <!-- Horizontal Layout: Image Left, Details Right -->
+            <div class="flex flex-row items-start gap-6">
+                <!-- Product Image -->
+                <img
+                    src="{{ asset('images/' . ($product->image ?? 'cup.png')) }}"
+                    alt="{{ $product->product_name }}"
+                    class="w-[100px] h-[144px] rounded-[10px] object-cover"
+                />
 
-        {{-- Debugging --}}
+                <!-- Product Info -->
+                <div class="flex flex-col justify-between h-full flex-1">
+                    <!-- Name, Category & Description -->
+                    <div>
+                        <!-- Product Name -->
+                        <h3 class="text-xl font-bold text-gray-800 mb-1">{{ $product->product_name }}</h3>
 
+                        <!-- Product Category (Coffee/Non-Coffee Series) -->
+                        <p class="text-sm text-[#745858] font-medium mb-2">
+                            {{ $product->category ?? 'Uncategorized' }}
+                        </p>
 
-        @if ($products && count($products) > 0)
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            @foreach ($products as $product)
-            <div
-            class="product-item flex bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
-            data-category="{{ strtolower($product->category) }}">
+                        <!-- Product Description -->
+                        <p class="text-gray-600 text-sm mb-4">
+                            {{ $product->description ?? 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' }}
+                        </p>
+                    </div>
 
-                    <!-- Product Image -->
-                    <img src="{{ asset('images/' . ($product->image ?? 'cup.png')) }}" alt="{{ $product->product_name }}"
-                        class="w-full h-48 object-cover">
+                    <!-- Pricing & Availability -->
+                    <div class="text-sm text-gray-700 mb-4 space-y-1 flex gap-2">
+                        <!-- Hot/Iced Buttons -->
+                        <div class="flex gap-2">
+                            <!-- Hot Button -->
+                            <button
+                                class="bg-[#745858] text-white hover:bg-[#5a4444] transition-all duration-300 w-[92px] h-[26px] rounded-[20px] text-sm flex items-center justify-center"
+                                type="button"
+                            >
+                                Hot: ₱{{ number_format($product->price_hot ?? 0, 2) }}
+                            </button>
 
-                    <!-- Product Info -->
-                    <div class="p-4">
-                        <h3 class="text-lg font-semibold mb-1">{{ $product->product_name }}</h3>
-                        <p class="text-sm text-gray-600 mb-2 capitalize">{{ $product->category ?? 'N/A' }}</p>
-
-                        <div class="mb-3 space-y-1">
-                            <p class="text-sm"><strong>Hot:</strong>
-                                {{ $product->price_hot ? '₱' . number_format($product->price_hot, 2) : 'N/A' }}</p>
-                            <p class="text-sm"><strong>Cold:</strong>
-                                {{ $product->price_cold ? '₱' . number_format($product->price_cold, 2) : 'N/A' }}</p>
+                            <!-- Iced Button -->
+                            <button
+                                class="bg-[#745858] text-white hover:bg-[#5a4444] transition-all duration-300 w-[92px] h-[26px] rounded-[20px] text-sm flex items-center justify-center"
+                                type="button"
+                            >
+                                Iced: ₱{{ number_format($product->price_iced ?? 0, 2) }}
+                            </button>
                         </div>
+                    </div>
 
-                        <!-- Product Availability -->
-                        <div class="mb-3">
-                            @if ($product->availability)
-                                <span class="inline-block px-3 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">
-                                    Available
-                                </span>
-                            @else
-                                <span class="inline-block px-3 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded-full">
-                                    Out of Stock
-                                </span>
-                            @endif
-                        </div>
+                    <!-- Availability -->
+                    @if ($product->availability === 'In Stock')
+                        <p class="text-green-600 font-semibold mb-4">Available</p>
+                    @else
+                        <p class="text-red-600 font-semibold mb-4">Out of Stock</p>
+                    @endif
 
-                        <button
+                    <!-- Add to Cart Button -->
+                    <button
                         onclick="addToBillingCart(
                             '{{ $product->product_name }}',
                             '{{ $product->price_hot ?? 0 }}',
-                            '{{ $product->price_cold ?? 0 }}'
+                            '{{ $product->price_iced ?? 0 }}'
                         )"
-                        class="w-full py-2 px-4 bg-[#745858] text-white rounded hover:bg-[#5a4444] text-sm"
-                        @if (!$product->availability) disabled class="cursor-not-allowed opacity-50" @endif
+                        class="bg-[#745858] text-white py-2 rounded-[20px] hover:bg-[#5a4444] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed w-full"
+                        @if ($product->availability !== 'In Stock') disabled @endif
                     >
-                        {{ $product->availability ? 'Order' : 'Unavailable' }}
+                        {{ $product->availability === 'In Stock' ? 'Add to Cart' : 'Unavailable' }}
                     </button>
-
-                    </div>
                 </div>
-            @endforeach
+            </div>
         </div>
-    @else
-        <p class="text-center text-gray-600">No products found.</p>
-    @endif
+        @endforeach
+    </div>
+</div>
 
 
 
@@ -211,21 +233,38 @@
         <!-- Cart items will be dynamically added here -->
     </div>
 
-    <!-- Order Summary -->
-    <div class="mt-4 border-t pt-4">
-        <div class="flex justify-between">
-            <span>Delivery Fee</span>
-            <span>₱ 50</span>
-        </div>
-        <div class="flex justify-between">
-            <span>Promo</span>
-            <span>₱ 0</span>
-        </div>
-        <div class="flex justify-between font-bold border-t mt-2 pt-2">
-            <span>Total</span>
-            <span id="totalAmount">₱ 0</span>
-        </div>
+ <div class="mt-4">
+    <label for="promoCodeInput" class="block text-sm font-medium mb-1">Enter Promo Code</label>
+    <div class="flex space-x-2">
+        <input type="text" id="promoCodeInput" class="flex-1 p-2 border border-gray-300 rounded" placeholder="Enter code...">
+        <button id="applyPromoBtn" class="bg-[#745858] text-white px-4 py-2 rounded hover:bg-[#5a4444] text-sm">Apply</button>
     </div>
+    <p id="promoFeedback" class="text-xs mt-2 text-green-600 hidden">Promo Applied Successfully!</p>
+    <p id="promoError" class="text-xs mt-2 text-red-600 hidden">Invalid or Expired Promo Code!</p>
+</div>
+
+    <p id="promoFeedback" class="text-xs mt-2 text-green-600 hidden">Promo Applied Successfully!</p>
+    <p id="promoError" class="text-xs mt-2 text-red-600 hidden">Invalid or Expired Promo Code!</p>
+</div>
+
+<!-- Order Summary Section -->
+<div class="mt-4 border-t pt-4 space-y-2">
+    <div class="flex justify-between">
+        <span>Delivery Fee</span>
+        <span id="deliveryFee">₱ 50.00</span>
+    </div>
+
+    <div class="flex justify-between">
+        <span>Promo Discount</span>
+        <span id="promoDiscount">₱ 0.00</span>
+    </div>
+
+    <div class="flex justify-between font-bold border-t pt-2">
+        <span>Total</span>
+        <span id="totalAmount">₱ 0.00</span>
+    </div>
+</div>
+
 
     <!-- Mode of Order -->
 <div class="mt-6">
@@ -247,7 +286,11 @@
 </div>
 
 <!-- Place Order Button -->
-<button id="placeOrderBtn" class="w-full mt-7 p-2 bg-[#745858] text-white rounded hover:bg-[#553C26]">Place Order</button>
+<a href="{{ route('deliveryuser') }}" class="block w-full mt-7 p-2 text-center bg-[#745858] text-white rounded hover:bg-[#553C26]">
+    Place Order
+</a>
+
+
 
 
 
@@ -418,40 +461,59 @@
     }
 
     // ✅ SEARCH FUNCTION FOR PRODUCTS
+    // ✅ LIVE SEARCH FUNCTION FOR PRODUCTS
     function searchProducts(query) {
-        query = query.trim().toLowerCase();
+    query = query.trim().toLowerCase();
 
-        const productItems = document.querySelectorAll('.product-item');
+    const productItems = document.querySelectorAll('.product-item');
+    const productContainer = document.getElementById('productContainer');
+    let noResultMessage = document.getElementById('noResultMessage');
+    let found = false;
 
-        let found = false;
+    productItems.forEach(item => {
+        const productName = item.querySelector('h3').innerText.toLowerCase();
 
-        productItems.forEach(item => {
-            const productName = item.querySelector('h3').innerText.toLowerCase();
-
-            if (productName.includes(query)) {
-                item.style.display = "flex";
-                found = true;
-            } else {
-                item.style.display = "none";
-            }
-        });
-
-        // If no products match
-        const noResultMessage = document.getElementById('noResultMessage');
-        if (!found) {
-            if (!noResultMessage) {
-                const message = document.createElement('p');
-                message.id = 'noResultMessage';
-                message.className = 'text-center text-gray-600 mt-4';
-                message.innerText = 'No products found.';
-                document.getElementById('productContainer').appendChild(message);
-            }
+        if (productName.includes(query)) {
+            item.style.display = "flex"; // display as flex since you're using flex layout
+            found = true;
         } else {
-            if (noResultMessage) {
-                noResultMessage.remove();
-            }
+            item.style.display = "none";
+        }
+    });
+
+    // Handle No Results Message
+    if (!found) {
+        if (!noResultMessage) {
+            noResultMessage = document.createElement('p');
+            noResultMessage.id = 'noResultMessage';
+            noResultMessage.className = 'text-center text-gray-600 mt-4';
+            noResultMessage.innerText = 'No products found.';
+            productContainer.appendChild(noResultMessage);
+        }
+    } else {
+        if (noResultMessage) {
+            noResultMessage.remove();
         }
     }
+}
+
+
+// Example cart items (this would be your actual cart data)
+const cartItems = [
+  { id: 1, name: 'Product A', quantity: 2, price: 100 },
+  { id: 2, name: 'Product B', quantity: 1, price: 150 }
+];
+
+document.getElementById('placeOrderBtn').addEventListener('click', function () {
+  // Save cart items to localStorage
+  localStorage.setItem('orderCart', JSON.stringify(cartItems));
+
+  // Redirect to the delivery page (update this to your delivery page path)
+  window.location.href = 'delivery.html';
+});
+
+
+
 
 </script>
 

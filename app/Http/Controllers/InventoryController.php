@@ -18,10 +18,11 @@ class InventoryController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title'       => 'required|string|max:255',
-            'category'    => 'required|string|max:255',
-            'price'       => 'required|numeric',
-            'availability'=> 'required|string'
+            'product_name'   => 'required|string|max:255',
+            'category'       => 'required|string|max:255',
+            'price_hot'      => 'nullable|numeric',
+            'price_iced'     => 'nullable|numeric',
+            'availability'   => 'required|string'
         ]);
 
         $product = Products::create($validated);
@@ -32,41 +33,25 @@ class InventoryController extends Controller
         ]);
     }
 
-    // Show edit form
-    public function edit($id)
-    {
-        $product = Products::findOrFail($id);
-        return view('inventory', compact('product'));
-    }
-
     // Process the edit form and update product
     public function update(Request $request, $id)
     {
-      $validated = $request->validate([
-    'title'       => 'required|string|max:255',
-    'category'    => 'required|string|max:255',
-    'price'       => 'required|numeric',
-    'availability'=> 'required|string'
-]);
-
-$product = Products::findOrFail($id);
-$product->update($validated);
-
-
-        $product->update([
-            'product_name' => $request->input('product_name'),
-            'category' => $request->input('category'),
-            'price' => $request->input('price'),
-            'availability' => $request->input('availability'),
+        $validated = $request->validate([
+            'product_name'   => 'required|string|max:255',
+            'category'       => 'required|string|max:255',
+            'price_hot'      => 'nullable|numeric',
+            'price_iced'     => 'nullable|numeric',
+            'availability'   => 'required|string'
         ]);
 
-        // Return JSON response
+        $product = Products::findOrFail($id);
+        $product->update($validated);
+
         return response()->json([
             'message' => 'Product updated successfully!',
             'product' => $product
         ]);
     }
-
 
     // Delete product
     public function destroy($id)
@@ -78,5 +63,4 @@ $product->update($validated);
             'message' => 'Product deleted successfully!'
         ]);
     }
-
 }

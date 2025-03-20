@@ -38,73 +38,99 @@
 </div>
     </div>
 
-    <!-- Add Product Modal -->
-    <div id="addProductModal" class="modal">
-        <div class="modal-content">
-            <span class="close" id="closeAddModalBtn">&times;</span>
-            <h3>Add Product</h3>
+   <!-- Add Product Modal -->
+<div id="addProductModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeAddModalBtn">&times;</span>
+        <h3>Add Product</h3>
 
-            <form id="addProductForm">
-                @csrf
-                <label for="addProductName">Product Name</label>
-                <input type="text" id="addProductName" name="product_name" placeholder="Product Name" required>
+        <form id="addProductForm">
+            @csrf
+            <label for="addProductName">Product Name</label>
+            <input type="text" id="addProductName" name="product_name" placeholder="Product Name" required>
 
-                <label for="addProductCategory">Category</label>
-                <select id="addProductCategory" name="category" required>
-                    <option disabled selected>Select Category</option>
-                    <option value="Coffee Series">Coffee Series</option>
-                    <option value="Non Coffee Series">Non Coffee Series</option>
-                </select>
+            <label for="addProductCategory">Category</label>
+            <select id="addProductCategory" name="category" required>
+                <option disabled selected>Select Category</option>
+                <option value="Coffee Series">Coffee Series</option>
+                <option value="Non-Coffee Series">Non-Coffee Series</option>
+            </select>
 
-                <label for="addProductPrice">Price</label>
-                <input type="number" id="addProductPrice" name="price" step="0.01" placeholder="Price" required>
+            <label for="addPriceHot">Price (Hot)</label>
+            <input type="number" id="addPriceHot" name="price_hot" step="0.01" placeholder="Price Hot">
 
-                <label for="addProductAvailability">Availability</label>
-                <select id="addProductAvailability" name="availability" required>
-                    <option disabled selected>Select Availability</option>
-                    <option value="In Stock">In Stock</option>
-                    <option value="Out of Stock">Out of Stock</option>
-                </select>
+            <label for="addPriceIced">Price (Iced)</label>
+            <input type="number" id="addPriceIced" name="price_iced" step="0.01" placeholder="Price Iced">
 
-                <button type="submit" class="btn-add">Add Product</button>
-            </form>
-        </div>
-    </div>
+            <label for="addProductAvailability">Availability</label>
+            <select id="addProductAvailability" name="availability" required>
+                <option disabled selected>Select Availability</option>
+                <option value="In Stock">In Stock</option>
+                <option value="Out of Stock">Out of Stock</option>
+            </select>
 
-    <!-- Inventory Table -->
-    <div class="inventory-list">
-        <h2>
-            Inventory
-            <i class="fas fa-plus add-icon" id="openModalBtn"></i>
-        </h2>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Product Name</th>
-                    <th>Category</th>
-                    <th>Price</th>
-                    <th>Availability</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="inventoryTable">
-                @foreach($products as $product)
-                <tr data-id="{{ $product->id }}">
-                    <td>{{ $product->product_name }}</td>
-                    <td>{{ $product->category }}</td>
-                    <td>P {{ number_format($product->price, 2) }}</td>
-                    <td>{{ $product->availability }}</td>
-                    <td>
-                        <button class="edit-btn" title="Edit"><i class="fas fa-edit"></i></button>
-                        <button class="delete-btn" title="Delete"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+            <button type="submit" class="btn-add">Add Product</button>
+        </form>
     </div>
 </div>
+
+
+    <!-- Inventory Table -->
+<!-- Inventory Table -->
+<div class="inventory-list">
+    <h2>
+        Inventory
+        <i class="fas fa-plus add-icon" id="openModalBtn"></i>
+    </h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Price (Hot)</th>
+                <th>Price (Iced)</th>
+                <th>Availability</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="inventoryTable">
+            @foreach($products as $product)
+            <tr data-id="{{ $product->id }}">
+                <td>{{ $product->product_name }}</td>
+                <td>{{ $product->category }}</td>
+                <td>
+                    @if(!is_null($product->price_hot))
+                        P {{ number_format($product->price_hot, 2) }}
+                    @else
+                        N/A
+                    @endif
+                </td>
+                <td>
+                    @if(!is_null($product->price_iced))
+                        P {{ number_format($product->price_iced, 2) }}
+                    @else
+                        N/A
+                    @endif
+                </td>
+                <td>{{ $product->availability }}</td>
+                <td>
+                    <button class="edit-btn" data-id="{{ $product->id }}" title="Edit"><i class="fas fa-edit"></i></button>
+                    <button class="delete-btn" data-id="{{ $product->id }}" title="Delete"><i class="fas fa-trash"></i></button>
+
+                </td>
+            </tr>
+            @endforeach
+
+            @if($products->isEmpty())
+            <tr>
+                <td colspan="6">No products found.</td>
+            </tr>
+            @endif
+        </tbody>
+    </table>
+</div>
+
 
 <!-- Edit Product Modal -->
 <div id="editProductModal" class="modal">

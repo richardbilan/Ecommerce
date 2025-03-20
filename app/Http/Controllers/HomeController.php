@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Products;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
@@ -16,14 +17,15 @@ class HomeController extends Controller
         $this->middleware('auth');
     }
 
-    /**
-     * Display the home page with all products.
-     */
-    public function index()
-    {
-        $products = Products::all(); // Fetch products from the database
-        return view('home', compact('products')); // Pass the products to the view
-    }
+
+
+public function index()
+{
+    $products = Products::all(); // Fetch products from the database
+    $user = Auth::user(); // Get the logged-in user
+    return view('home', compact('products', 'user')); // Pass both products and user
+}
+
 
     /**
      * Admin Home Page
@@ -51,6 +53,7 @@ class HomeController extends Controller
         return view('inventory');
     }
 
+
     public function orders(): View
     {
         return view('order');
@@ -65,4 +68,10 @@ class HomeController extends Controller
     {
         return view('promotions');
     }
+    public function userHome()
+{
+    $products = Products::where('availability', 'In Stock')->get(); // Or ->all() if you want both
+    return view('home', compact('products'));
+}
+
 }

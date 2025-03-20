@@ -8,13 +8,21 @@ use App\Models\Products;
 class ProductController extends Controller
 {
     /**
-     * Display all products in the home view.
+     * Display all products in the inventory view.
      */
     public function index()
     {
         $products = Products::all();
-        return view('home', compact('products'));
+        return view('inventory', compact('products'));
+    }
 
+    /**
+     * Display all products in the home view (optional).
+     */
+    public function showProducts()
+    {
+        $products = Products::all();
+        return view('home', compact('products'));
     }
 
     /**
@@ -39,7 +47,14 @@ class ProductController extends Controller
             'price_iced'    => 'nullable|numeric',
             'availability'  => 'required|in:available,out of stock',
             'tag'           => 'nullable|string|max:255',
+            'image'         => 'nullable|image|max:2048', // Optional image upload
         ]);
+
+        // Handle file upload if image is present
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('products', 'public');
+            $validated['image'] = $imagePath;
+        }
 
         $product = Products::create($validated);
 
@@ -54,6 +69,8 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $product = Products::findOrFail($id);
+
         $validated = $request->validate([
             'product_name'  => 'required|string|max:255',
             'category'      => 'required|string|max:255',
@@ -61,9 +78,15 @@ class ProductController extends Controller
             'price_iced'    => 'nullable|numeric',
             'availability'  => 'required|in:available,out of stock',
             'tag'           => 'nullable|string|max:255',
+            'image'         => 'nullable|image|max:2048', // Optional image upload
         ]);
 
-        $product = Products::findOrFail($id);
+        // Handle file upload if image is present
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('products', 'public');
+            $validated['image'] = $imagePath;
+        }
+
         $product->update($validated);
 
         return response()->json([
@@ -99,7 +122,8 @@ class ProductController extends Controller
     {
         $searchTerm = $request->input('query');
 
-        $products = Products::where('product_name', 'LIKE', "%{$searchTerm}%")
+        $products = Products::query()
+            ->where('product_name', 'LIKE', "%{$searchTerm}%")
             ->orWhere('category', 'LIKE', "%{$searchTerm}%")
             ->get();
 
@@ -148,19 +172,23 @@ class ProductController extends Controller
             return response()->json([], 204); // No content
         }
 
-        $products = Products::where('product_name', 'LIKE', "%{$search}%")
+        $products = Products::query()
+            ->where('product_name', 'LIKE', "%{$search}%")
             ->orWhere('category', 'LIKE', "%{$search}%")
             ->get();
 
         return response()->json($products);
     }
-    public function showProducts() {
-        // Fetch all products from the database
-        $products = Products::all(); // You can add additional filters or sorting if needed
 
-        // Pass the products to the view
+    /**
+     * Show only active products in home view (optional).
+     */
+    public function activeProducts()
+    {
+        $products = Products::where('status', 'active')->get();
         return view('home', compact('products'));
     }
-
+// Removed duplicate search method to avoid redeclaration error.
 
 }
+
