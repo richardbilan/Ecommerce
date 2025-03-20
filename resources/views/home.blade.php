@@ -90,8 +90,6 @@
             <h1>Welcome, Guest!</h1>
         @endguest
         <div class="flex justify-between items-center mb-6">
-
-            <!-- Search Form -->
            <!-- Search Form -->
 <form role="search" onsubmit="return false;">
     <div class="relative">
@@ -120,8 +118,6 @@
     <img src="{{ asset('images/image2.jpeg') }}"
         class="absolute inset-0 w-full h-full object-cover hidden rounded-xl" alt="Slideshow 2">
 </div>
-
-<!-- Category Section -->
 <div class="mb-8">
     <h2 class="text-xl font-bold mb-4">Choose Your Category</h2>
     <div class="flex flex-wrap gap-4">
@@ -131,29 +127,58 @@
         <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white" data-category="best seller">Best Seller</button>
     </div>
 </div>
+
+
 <div class="max-w-7xl mx-auto px-4 py-8">
     <h2 class="text-2xl font-bold mb-6">Choose Menu</h2>
 
     <!-- Grid layout for the menu items -->
     <div id="productContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
         @foreach ($products as $product)
+
         <!-- Product Card -->
-        <div class="product-item bg-[#F5F5F5] p-6 rounded-xl shadow-md flex flex-col" data-category="{{ strtolower($product->category) }}">
+        <div class="product-item bg-[#F5F5F5] p-6 rounded-xl shadow-md flex flex-col transition-transform duration-300 ease-in-out hover:-translate-y-1 hover:shadow-md hover:bg-[#f0e6db]" data-category="{{ strtolower(trim($product->category ?? 'uncategorized')) }}">
+
+
+
             <!-- Horizontal Layout: Image Left, Details Right -->
             <div class="flex flex-row items-start gap-6">
+
                 <!-- Product Image -->
-                <img
-                    src="{{ asset('images/' . ($product->image ?? 'cup.png')) }}"
-                    alt="{{ $product->product_name }}"
-                    class="w-[100px] h-[144px] rounded-[10px] object-cover"
-                />
+                <div class="relative">
+                    <img
+                        src="{{ asset('images/' . ($product->image ?? 'cup.png')) }}"
+                        alt="{{ $product->product_name }}"
+                        class="w-[100px] h-[144px] rounded-[10px] object-cover"
+                    />
+
+                    <!-- Best Seller Badge -->
+                    @if ($product->is_best_seller ?? false)
+                        <span class="absolute bottom-[-10px] left-1/2 transform -translate-x-1/2 bg-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-lg shadow-md">
+                            Best Seller
+                        </span>
+                    @endif
+                </div>
 
                 <!-- Product Info -->
                 <div class="flex flex-col justify-between h-full flex-1">
-                    <!-- Name, Category & Description -->
-                    <div>
-                        <!-- Product Name -->
-                        <h3 class="text-xl font-bold text-gray-800 mb-1">{{ $product->product_name }}</h3>
+
+                    <!-- Name, Availability & Category/Description -->
+                    <div class="mb-4">
+
+              <div class="flex items-center justify-between mb-1">
+                            <!-- Product Name -->
+                            <h3 class="text-xl font-bold text-gray-800">
+                                {{ $product->product_name }}
+                            </h3>
+
+                            <!-- Availability -->
+                            @if ($product->availability === 'In Stock')
+                                <p class="text-green-600 text-sm font-semibold">Available</p>
+                            @else
+                                <p class="text-red-600 text-sm font-semibold">Out of Stock</p>
+                            @endif
+                        </div>
 
                         <!-- Product Category (Coffee/Non-Coffee Series) -->
                         <p class="text-sm text-[#745858] font-medium mb-2">
@@ -161,39 +186,30 @@
                         </p>
 
                         <!-- Product Description -->
-                        <p class="text-gray-600 text-sm mb-4">
+                        <p class="text-gray-600 text-sm">
                             {{ $product->description ?? 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' }}
                         </p>
                     </div>
 
-                    <!-- Pricing & Availability -->
-                    <div class="text-sm text-gray-700 mb-4 space-y-1 flex gap-2">
-                        <!-- Hot/Iced Buttons -->
-                        <div class="flex gap-2">
-                            <!-- Hot Button -->
-                            <button
-                                class="bg-[#745858] text-white hover:bg-[#5a4444] transition-all duration-300 w-[92px] h-[26px] rounded-[20px] text-sm flex items-center justify-center"
-                                type="button"
-                            >
-                                Hot: ₱{{ number_format($product->price_hot ?? 0, 2) }}
-                            </button>
+                    <!-- Pricing Buttons -->
+                    <div class="text-sm text-gray-700 mb-4 flex gap-2">
 
-                            <!-- Iced Button -->
-                            <button
-                                class="bg-[#745858] text-white hover:bg-[#5a4444] transition-all duration-300 w-[92px] h-[26px] rounded-[20px] text-sm flex items-center justify-center"
-                                type="button"
-                            >
-                                Iced: ₱{{ number_format($product->price_iced ?? 0, 2) }}
-                            </button>
-                        </div>
+                        <!-- Hot Button -->
+                        <button
+                            class="bg-[#745858] text-white hover:bg-[#5a4444] transition-all duration-300 w-[92px] h-[26px] rounded-[20px] text-sm flex items-center justify-center"
+                            type="button"
+                        >
+                            Hot: ₱{{ number_format($product->price_hot ?? 0, 2) }}
+                        </button>
+
+                        <!-- Iced Button -->
+                        <button
+                            class="bg-[#745858] text-white hover:bg-[#5a4444] transition-all duration-300 w-[92px] h-[26px] rounded-[20px] text-sm flex items-center justify-center"
+                            type="button"
+                        >
+                            Iced: ₱{{ number_format($product->price_iced ?? 0, 2) }}
+                        </button>
                     </div>
-
-                    <!-- Availability -->
-                    @if ($product->availability === 'In Stock')
-                        <p class="text-green-600 font-semibold mb-4">Available</p>
-                    @else
-                        <p class="text-red-600 font-semibold mb-4">Out of Stock</p>
-                    @endif
 
                     <!-- Add to Cart Button -->
                     <button
@@ -213,6 +229,8 @@
         @endforeach
     </div>
 </div>
+
+                 <!-- Product Name and Availability Row -->
 
 
 
@@ -295,66 +313,80 @@
 
 
 <script>
-    // Open/Close Billing Sidebar
-    document.getElementById('billingBtn').addEventListener('click', function (event) {
-        event.preventDefault();
-        document.getElementById('rightSidebar').classList.remove('translate-x-full');
-    });
-
-    document.getElementById('closeSidebar').addEventListener('click', function () {
-        document.getElementById('rightSidebar').classList.add('translate-x-full');
-    });
-
-    // Toggle User Menu
-    document.getElementById('userMenuBtn').addEventListener('click', function () {
-        document.getElementById('userMenu').classList.toggle('hidden');
-    });
-
-    // Slideshow
-    let slides = document.querySelectorAll('.w-full.h-64.overflow-hidden.relative img');
-    let index = 0;
-    setInterval(() => {
-        slides[index].classList.add('hidden');
-        index = (index + 1) % slides.length;
-        slides[index].classList.remove('hidden');
-    }, 2000);
-
-    // Mode of Order
-    document.getElementById("orderMode").addEventListener("change", function () {
-        let locationBtn = document.getElementById("locationBtn");
-        locationBtn.textContent = this.value === "pickup" ? "Current Location" : "Enter Your Location";
-    });
-
-    // Favorite Button
-    document.getElementById('favoriteBtn').addEventListener('click', function () {
-        let heartIcon = document.getElementById('heartIcon');
-        if (heartIcon.classList.contains('text-gray-500')) {
-            heartIcon.classList.remove('text-gray-500');
-            heartIcon.classList.add('text-red-500');
-            heartIcon.setAttribute("fill", "red");
-        } else {
-            heartIcon.classList.remove('text-red-500');
-            heartIcon.classList.add('text-gray-500');
-            heartIcon.setAttribute("fill", "none");
-        }
-    });
-
-    // Quantity Controls
     document.addEventListener("DOMContentLoaded", function () {
+        /** ✅ OPEN/CLOSE BILLING SIDEBAR **/
+        const billingBtn = document.getElementById("billingBtn");
+        const closeSidebar = document.getElementById("closeSidebar");
+        const rightSidebar = document.getElementById("rightSidebar");
+
+        if (billingBtn && closeSidebar && rightSidebar) {
+            billingBtn.addEventListener("click", function (event) {
+                event.preventDefault();
+                rightSidebar.classList.remove("translate-x-full");
+            });
+
+            closeSidebar.addEventListener("click", function () {
+                rightSidebar.classList.add("translate-x-full");
+            });
+        }
+
+        /** ✅ TOGGLE USER MENU **/
+        const userMenuBtn = document.getElementById("userMenuBtn");
+        const userMenu = document.getElementById("userMenu");
+
+        if (userMenuBtn && userMenu) {
+            userMenuBtn.addEventListener("click", function () {
+                userMenu.classList.toggle("hidden");
+            });
+        }
+
+        /** ✅ SLIDESHOW **/
+        let slides = document.querySelectorAll(".w-full.h-64.overflow-hidden.relative img");
+        let index = 0;
+
+        if (slides.length > 0) {
+            setInterval(() => {
+                slides[index].classList.add("hidden");
+                index = (index + 1) % slides.length;
+                slides[index].classList.remove("hidden");
+            }, 2000);
+        }
+
+        /** ✅ MODE OF ORDER **/
+        const orderMode = document.getElementById("orderMode");
+        const locationBtn = document.getElementById("locationBtn");
+
+        if (orderMode && locationBtn) {
+            orderMode.addEventListener("change", function () {
+                locationBtn.textContent = this.value === "pickup" ? "Current Location" : "Enter Your Location";
+            });
+        }
+
+        /** ✅ FAVORITE BUTTON **/
+        const favoriteBtn = document.getElementById("favoriteBtn");
+        const heartIcon = document.getElementById("heartIcon");
+
+        if (favoriteBtn && heartIcon) {
+            favoriteBtn.addEventListener("click", function () {
+                heartIcon.classList.toggle("text-gray-500");
+                heartIcon.classList.toggle("text-red-500");
+                heartIcon.setAttribute("fill", heartIcon.classList.contains("text-red-500") ? "red" : "none");
+            });
+        }
+
+        /** ✅ QUANTITY CONTROLS **/
         const quantityDisplay = document.getElementById("quantity");
         const increaseBtn = document.getElementById("increaseBtn");
         const decreaseBtn = document.getElementById("decreaseBtn");
 
         let quantity = 1;
 
-        if (increaseBtn) {
+        if (quantityDisplay && increaseBtn && decreaseBtn) {
             increaseBtn.addEventListener("click", function () {
                 quantity++;
                 quantityDisplay.textContent = quantity;
             });
-        }
 
-        if (decreaseBtn) {
             decreaseBtn.addEventListener("click", function () {
                 if (quantity > 1) {
                     quantity--;
@@ -362,160 +394,120 @@
                 }
             });
         }
-    });
 
-    // ✅ CATEGORY FILTER FUNCTION
-    document.addEventListener("DOMContentLoaded", function () {
-    const categoryButtons = document.querySelectorAll('.category-btn');
-    const productItems = document.querySelectorAll('.product-item');
+        /** ✅ PRODUCT CATEGORY FILTER **/
+        const categoryButtons = document.querySelectorAll(".category-btn");
+        const productItems = document.querySelectorAll(".product-item");
 
-    if (!categoryButtons.length || !productItems.length) {
-        console.warn("No categories or products found!");
-        return;
-    }
+        categoryButtons.forEach((button) => {
+            button.addEventListener("click", function () {
+                const selectedCategory = this.getAttribute("data-category").toLowerCase();
 
-    categoryButtons.forEach(button => {
-        button.addEventListener('click', function () {
-            const selectedCategory = this.getAttribute('data-category').toLowerCase();
+                productItems.forEach((item) => {
+                    const itemCategory = item.getAttribute("data-category").toLowerCase();
+                    item.style.display = selectedCategory === "all" || itemCategory.includes(selectedCategory) ? "flex" : "none";
+                });
+            });
+        });
 
-            productItems.forEach(item => {
-                const itemCategory = item.getAttribute('data-category').toLowerCase();
+        /** ✅ ADD TO BILLING CART FUNCTION **/
+        window.addToBillingCart = function (productName, priceHot, priceCold) {
+            const selectedOption = priceHot > 0 ? "Hot" : "Cold";
+            const selectedPrice = priceHot > 0 ? priceHot : priceCold;
 
-                if (selectedCategory === 'all' || itemCategory === selectedCategory) {
-                    item.style.display = 'block'; // or 'flex' depending on your CSS layout
+            const cartItemHTML = `
+                <div class="bg-white p-3 rounded shadow-md cart-item" data-price="${selectedPrice}">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="font-semibold">${productName} <span class="text-sm text-gray-500">(${selectedOption})</span></h3>
+                            <p class="text-sm">₱ <span class="item-price">${selectedPrice}</span></p>
+                        </div>
+                        <button onclick="removeCartItem(this)">
+                            <img src="{{ asset('images/close.png') }}" alt="Remove Item" class="w-5 h-5">
+                        </button>
+                    </div>
+                    <div class="flex justify-between items-center mt-2">
+                        <div class="flex items-center space-x-2">
+                            <button class="bg-gray-300 px-2 py-1 rounded" onclick="changeQuantity(this, -1)">-</button>
+                            <span class="quantity w-6 text-center">1</span>
+                            <button class="bg-gray-300 px-2 py-1 rounded" onclick="changeQuantity(this, 1)">+</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById("cartItems").insertAdjacentHTML("beforeend", cartItemHTML);
+            rightSidebar.classList.remove("translate-x-full");
+
+            updateTotal();
+        };
+
+        window.removeCartItem = function (button) {
+            button.closest(".cart-item").remove();
+            updateTotal();
+        };
+
+        window.changeQuantity = function (button, change) {
+            const quantitySpan = button.parentElement.querySelector(".quantity");
+            let quantity = parseInt(quantitySpan.textContent);
+
+            quantity = Math.max(1, quantity + change);
+            quantitySpan.textContent = quantity;
+
+            updateTotal();
+        };
+
+        window.updateTotal = function () {
+            let total = 0;
+            document.querySelectorAll(".cart-item").forEach((item) => {
+                const price = parseFloat(item.getAttribute("data-price"));
+                const quantity = parseInt(item.querySelector(".quantity").textContent);
+                total += price * quantity;
+            });
+
+            document.getElementById("totalAmount").textContent = `₱ ${total.toFixed(2)}`;
+        };
+
+        /** ✅ LIVE SEARCH FUNCTION **/
+        window.searchProducts = function (query) {
+            query = query.trim().toLowerCase();
+            const productItems = document.querySelectorAll(".product-item");
+            const productContainer = document.getElementById("productContainer");
+            let noResultMessage = document.getElementById("noResultMessage");
+            let found = false;
+
+            productItems.forEach((item) => {
+                const productName = item.querySelector("h3").innerText.toLowerCase();
+                if (productName.includes(query)) {
+                    item.style.display = "flex";
+                    found = true;
                 } else {
-                    item.style.display = 'none';
+                    item.style.display = "none";
                 }
             });
 
-            // Highlight the active button
-            categoryButtons.forEach(btn => btn.classList.remove('bg-[#745858]', 'text-white'));
-            this.classList.add('bg-[#745858]', 'text-white');
+            // Handle No Results Message
+            if (!found) {
+                if (!noResultMessage) {
+                    noResultMessage = document.createElement("p");
+                    noResultMessage.id = "noResultMessage";
+                    noResultMessage.className = "text-center text-gray-600 mt-4";
+                    noResultMessage.innerText = "No products found.";
+                    productContainer.appendChild(noResultMessage);
+                }
+            } else if (noResultMessage) {
+                noResultMessage.remove();
+            }
+        };
+
+        /** ✅ PLACE ORDER FUNCTION **/
+        document.getElementById("placeOrderBtn")?.addEventListener("click", function () {
+            localStorage.setItem("orderCart", JSON.stringify(cartItems));
+            window.location.href = "delivery.html";
         });
     });
-});
-
-
-
-    // ✅ BILLING CART FUNCTIONS
-    function addToBillingCart(productName, priceHot, priceCold) {
-        const selectedOption = priceHot > 0 ? "Hot" : "Cold";
-        const selectedPrice = priceHot > 0 ? priceHot : priceCold;
-
-        const cartItemHTML = `
-            <div class="bg-white p-3 rounded shadow-md cart-item" data-price="${selectedPrice}">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h3 class="font-semibold">${productName} <span class="text-sm text-gray-500">(${selectedOption})</span></h3>
-                        <p class="text-sm">₱ <span class="item-price">${selectedPrice}</span></p>
-                    </div>
-                    <button onclick="removeCartItem(this)">
-                        <img src="{{ asset('images/close.png') }}" alt="Remove Item" class="w-5 h-5">
-                    </button>
-                </div>
-                <div class="flex justify-between items-center mt-2">
-                    <div class="flex items-center space-x-2">
-                        <button class="bg-gray-300 px-2 py-1 rounded" onclick="changeQuantity(this, -1)">-</button>
-                        <span class="quantity w-6 text-center">1</span>
-                        <button class="bg-gray-300 px-2 py-1 rounded" onclick="changeQuantity(this, 1)">+</button>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        const cartContainer = document.getElementById("cartItems");
-        cartContainer.insertAdjacentHTML('beforeend', cartItemHTML);
-
-        document.getElementById("rightSidebar").classList.remove("translate-x-full");
-
-        updateTotal();
-    }
-
-    function removeCartItem(button) {
-        const item = button.closest('.cart-item');
-        item.remove();
-        updateTotal();
-    }
-
-    function changeQuantity(button, change) {
-        const quantitySpan = button.parentElement.querySelector('.quantity');
-        let quantity = parseInt(quantitySpan.textContent);
-
-        quantity = Math.max(1, quantity + change);
-        quantitySpan.textContent = quantity;
-
-        updateTotal();
-    }
-
-    function updateTotal() {
-        const cartItems = document.querySelectorAll('.cart-item');
-        let total = 0;
-
-        cartItems.forEach(item => {
-            const price = parseFloat(item.getAttribute('data-price'));
-            const quantity = parseInt(item.querySelector('.quantity').textContent);
-            total += price * quantity;
-        });
-
-        document.getElementById('totalAmount').textContent = `₱ ${total.toFixed(2)}`;
-    }
-
-    // ✅ SEARCH FUNCTION FOR PRODUCTS
-    // ✅ LIVE SEARCH FUNCTION FOR PRODUCTS
-    function searchProducts(query) {
-    query = query.trim().toLowerCase();
-
-    const productItems = document.querySelectorAll('.product-item');
-    const productContainer = document.getElementById('productContainer');
-    let noResultMessage = document.getElementById('noResultMessage');
-    let found = false;
-
-    productItems.forEach(item => {
-        const productName = item.querySelector('h3').innerText.toLowerCase();
-
-        if (productName.includes(query)) {
-            item.style.display = "flex"; // display as flex since you're using flex layout
-            found = true;
-        } else {
-            item.style.display = "none";
-        }
-    });
-
-    // Handle No Results Message
-    if (!found) {
-        if (!noResultMessage) {
-            noResultMessage = document.createElement('p');
-            noResultMessage.id = 'noResultMessage';
-            noResultMessage.className = 'text-center text-gray-600 mt-4';
-            noResultMessage.innerText = 'No products found.';
-            productContainer.appendChild(noResultMessage);
-        }
-    } else {
-        if (noResultMessage) {
-            noResultMessage.remove();
-        }
-    }
-}
-
-
-// Example cart items (this would be your actual cart data)
-const cartItems = [
-  { id: 1, name: 'Product A', quantity: 2, price: 100 },
-  { id: 2, name: 'Product B', quantity: 1, price: 150 }
-];
-
-document.getElementById('placeOrderBtn').addEventListener('click', function () {
-  // Save cart items to localStorage
-  localStorage.setItem('orderCart', JSON.stringify(cartItems));
-
-  // Redirect to the delivery page (update this to your delivery page path)
-  window.location.href = 'delivery.html';
-});
-
-
-
-
 </script>
+
 
 </body>
 </html>
