@@ -397,18 +397,19 @@
 
         /** ✅ PRODUCT CATEGORY FILTER **/
         const categoryButtons = document.querySelectorAll(".category-btn");
-        const productItems = document.querySelectorAll(".product-item");
+const productItems = document.querySelectorAll(".product-item");
 
-        categoryButtons.forEach((button) => {
-            button.addEventListener("click", function () {
-                const selectedCategory = this.getAttribute("data-category").toLowerCase();
+categoryButtons.forEach((button) => {
+    button.addEventListener("click", function () {
+        const selectedCategory = this.getAttribute("data-category").trim().toLowerCase();
 
-                productItems.forEach((item) => {
-                    const itemCategory = item.getAttribute("data-category").toLowerCase();
-                    item.style.display = selectedCategory === "all" || itemCategory.includes(selectedCategory) ? "flex" : "none";
-                });
-            });
+        productItems.forEach((item) => {
+            const itemCategory = item.getAttribute("data-category").trim().toLowerCase();
+
+            item.style.display = selectedCategory === "all" || itemCategory === selectedCategory ? "flex" : "none";
         });
+    });
+});
 
         /** ✅ ADD TO BILLING CART FUNCTION **/
         window.addToBillingCart = function (productName, priceHot, priceCold) {
