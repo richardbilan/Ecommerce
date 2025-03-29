@@ -7,7 +7,9 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\PromotionController;
-
+use App\Http\Controllers\OrderController;
+use Illuminate\Http\Request;
+use App\Models\Order;
 
 //------------------------------------------ AUTHENTICATION ROUTES ------------------------------------------
 Route::get('/login', fn() => view('Authentication.Login'))->name('login');
@@ -19,7 +21,7 @@ Route::get('/', fn() => view('landing'))->name('landing');
 //------------------------------------------ USER ROUTES ------------------------------------------
 Route::middleware(['auth', 'user-access:user'])->group(function () {
     Route::get('/home', [ProductController::class, 'home'])->name('home');
-    Route::get('/deliveryuser', fn(): Factory|View => view('deliveryuser'))->name('deliveryuser');
+    Route::get('/deliveryuser/{orderId}', [OrderController::class, 'showDeliveryUser'])->name('deliveryuser');
     Route::get('/account_settings', fn() => view('account_settings'))->name('account_settings');
 });
 
@@ -86,9 +88,6 @@ Route::middleware(['auth', 'user-access:admin'])->group(function () {
 });
 
 
-Route::get('/deliveryuser', function () {
-    return view('deliveryuser');
-})->name('deliveryuser');
 
 Route::get('/search', [ProductController::class, 'search'])->name('products.search');
 
@@ -98,3 +97,38 @@ Route::get('/search', [ProductController::class, 'search'])->name('products.sear
 Route::post('/products', [ProductController::class, 'store'])->name('products.store');
 
 Route::view('/deliveryuser', 'deliveryuser')->name('deliveryuser');
+
+//order routes
+Route::post('/place-order', [OrderController::class, 'store'])->name('place.order');
+Route::post('/place-order', [OrderController::class, 'placeOrder']);
+
+
+
+
+
+Route::post('/place-order', function (Request $request) {
+    $order = Order::create([
+        'user_id' => $request->user_id,
+        'order_details' => json_encode($request->order_details),
+        'delivery_address' => $request->delivery_address,
+        'payment_method' => $request->payment_method,
+        'total_price' => $request->total_price,
+        'status' => $request->status
+    ]);
+
+    return response()->json(['success' => true, 'order_id' => $order->id]);
+
+});
+Route::get('/deliveryuser/{orderId}', [OrderController::class, 'showReceipt']);
+Route::get('/deliveryuser/{orderId}', [OrderController::class, 'showDeliveryUser']);
+Route::get('/deliveryuser/{orderId}', [OrderController::class, 'showDeliveryUser'])->name('deliveryuser');
+
+
+//promotions
+
+
+Route::get('/promotions', [PromotionController::class, 'index'])->name('promotions');
+Route::post('/promotions', [PromotionController::class, 'store'])->name('promotions.store');
+Route::put('/promotions/{id}', [PromotionController::class, 'update'])->name('promotions.update');
+Route::delete('/promotions/{id}', [PromotionController::class, 'destroy'])->name('promotions.destroy');
+Route::get('/check-promo', [PromotionController::class, 'checkPromo']);

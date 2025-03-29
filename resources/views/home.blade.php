@@ -279,8 +279,16 @@
 <!-- Order Summary Section -->
 <div class="mt-4 border-t pt-4 space-y-2">
     <div class="flex justify-between">
+        <span>Mode of Order:</span>
+        <select id="modeOfOrder" class="border px-2 py-1 rounded">
+            <option value="pickup">Pick-up (Free)</option>
+            <option value="delivery">Delivery (+₱50.00)</option>
+        </select>
+    </div>
+
+    <div class="flex justify-between">
         <span>Delivery Fee</span>
-        <span id="deliveryFee">₱ 50.00</span>
+        <span id="deliveryFee">₱ 0.00</span>
     </div>
 
     <div class="flex justify-between">
@@ -288,8 +296,8 @@
         <span id="promoDiscount">₱ 0.00</span>
     </div>
 
-    <div class="flex justify-between font-bold border-t pt-2">
-        <span>Total</span>
+    <div class="flex justify-between font-bold text-lg">
+        <span>Total Amount</span>
         <span id="totalAmount">₱ 0.00</span>
     </div>
 </div>
@@ -515,9 +523,142 @@ categoryButtons.forEach((button) => {
         /** ✅ PLACE ORDER FUNCTION **/
         document.getElementById("placeOrderBtn")?.addEventListener("click", function () {
             localStorage.setItem("orderCart", JSON.stringify(cartItems));
-            window.location.href = "delivery.html";
+            window.location.href = "deliveryuser";
         });
     });
+
+    //promotion/ Discount
+    document.addEventListener("DOMContentLoaded", function () {
+    const applyPromoBtn = document.getElementById("applyPromoBtn");
+    const promoCodeInput = document.getElementById("promoCodeInput");
+    const promoDiscountSpan = document.getElementById("promoDiscount");
+    const totalAmountSpan = document.getElementById("totalAmount");
+    const promoFeedback = document.getElementById("promoFeedback");
+    const promoError = document.getElementById("promoError");
+
+    let initialTotal = 0.00; // Initial total bill (update dynamically in real scenarios)
+
+    applyPromoBtn.addEventListener("click", function () {
+        let promoCode = promoCodeInput.value.trim();
+
+        if (promoCode === "") {
+            promoError.textContent = "Please enter a promo code!";
+            promoError.classList.remove("hidden");
+            return;
+        }
+
+        // AJAX request to check promo code validity
+        fetch(`/check-promo?code=${promoCode}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.valid) {
+                    let discount = parseFloat(data.discount);
+                    let newTotal = initialTotal - discount;
+
+                    promoDiscountSpan.textContent = `₱ ${discount.toFixed(2)}`;
+                    totalAmountSpan.textContent = `₱ ${newTotal.toFixed(2)}`;
+
+                    promoFeedback.classList.remove("hidden");
+                    promoError.classList.add("hidden");
+                } else {
+                    promoFeedback.classList.add("hidden");
+                    promoError.classList.remove("hidden");
+                    promoError.textContent = "Invalid or Expired Promo Code!";
+                }
+            })
+            .catch(error => console.error("Error fetching promo:", error));
+    });
+});
+
+//delivery Mode
+document.addEventListener("DOMContentLoaded", function () {
+    const applyPromoBtn = document.getElementById("applyPromoBtn");
+    const promoCodeInput = document.getElementById("promoCodeInput");
+    const promoDiscountSpan = document.getElementById("promoDiscount");
+    const totalAmountSpan = document.getElementById("totalAmount");
+    const promoFeedback = document.getElementById("promoFeedback");
+    const promoError = document.getElementById("promoError");
+    const modeOfOrder = document.getElementById("modeOfOrder");
+    const deliveryFeeSpan = document.getElementById("deliveryFee");
+    const subtotalSpan = document.getElementById("subtotal");
+
+    let discountAmount = 0; // Default discount
+    let deliveryFee = 0; // Default delivery fee
+    let subtotal = 0; // Initial subtotal
+
+    // Function to calculate subtotal dynamically
+    function calculateSubtotal() {
+        subtotal = 0;
+        document.querySelectorAll(".order-item").forEach(item => {
+            const price = parseFloat(item.querySelector(".item-price").textContent.replace("₱ ", ""));
+            const quantityInput = item.querySelector(".item-quantity");
+            let quantity = parseInt(quantityInput.value) || 0;
+
+            subtotal += price * quantity;
+        });
+
+        subtotalSpan.textContent = `₱ ${subtotal.toFixed(2)}`;
+        updateTotal();
+    }
+
+    // Function to update the total amount
+    function updateTotal() {
+        let newTotal = subtotal - discountAmount + deliveryFee;
+        totalAmountSpan.textContent = `₱ ${newTotal.toFixed(2)}`;
+    }
+
+    // Apply promo code
+    applyPromoBtn.addEventListener("click", function () {
+        let promoCode = promoCodeInput.value.trim();
+
+        if (promoCode === "") {
+            promoError.textContent = "Please enter a promo code!";
+            promoError.classList.remove("hidden");
+            return;
+        }
+
+        // Simulated AJAX request (Replace with actual API call)
+        fetch(`/check-promo?code=${promoCode}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.valid) {
+                    discountAmount = parseFloat(data.discount);
+                    promoDiscountSpan.textContent = `₱ -${discountAmount.toFixed(2)}`;
+                    promoFeedback.classList.remove("hidden");
+                    promoError.classList.add("hidden");
+                } else {
+                    discountAmount = 0;
+                    promoDiscountSpan.textContent = "₱ 0.00";
+                    promoFeedback.classList.add("hidden");
+                    promoError.classList.remove("hidden");
+                    promoError.textContent = "Invalid or Expired Promo Code!";
+                }
+                updateTotal(); // Recalculate total
+            })
+            .catch(error => console.error("Error fetching promo:", error));
+    });
+
+    // Handle mode of order selection (Delivery or Pickup)
+    modeOfOrder.addEventListener("change", function () {
+        if (modeOfOrder.value === "delivery") {
+            deliveryFee = 50.00;
+        } else {
+            deliveryFee = 0;
+        }
+        deliveryFeeSpan.textContent = `₱ ${deliveryFee.toFixed(2)}`;
+        updateTotal();
+    });
+
+    // Update subtotal when quantity changes
+    document.querySelectorAll(".item-quantity").forEach(input => {
+        input.addEventListener("input", calculateSubtotal);
+    });
+
+    // Initial Calculation
+    calculateSubtotal();
+});
+
+
 </script>
 
 

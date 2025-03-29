@@ -21,7 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'type'
+        'type',
+        'location', // Add 'location' here
     ];
 
     /**
@@ -48,7 +49,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Interact with the user's first name.
+     * Interact with the user's type.
      *
      * @param  string  $value
      * @return \Illuminate\Database\Eloquent\Casts\Attribute
@@ -57,6 +58,19 @@ class User extends Authenticatable
     {
         return new Attribute(
             get: fn ($value) =>  ["user", "admin", "manager"][$value],
+        );
+    }
+
+    /**
+     * Interact with the user's location.
+     *
+     * @param  string  $value
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function location(): Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => ucfirst($value), // Optionally, capitalize the location
         );
     }
 }

@@ -60,7 +60,9 @@
   <!-- Main Content -->
   <!-- Main Content -->
 <main class="flex-1 p-6">
-    <h1 class="text-2xl font-bold">Your Delivery, {{ Auth::user()->name }}</h1>
+    <h1 class="text-2xl font-bold">
+        Your Delivery, {{ Auth::check() ? Auth::user()->name : 'Guest' }}
+    </h1>
 
     <!-- Flex container for Map and Track Order -->
     <div class="mt-4 flex flex-col lg:flex-row gap-6">
@@ -91,10 +93,43 @@
           <p>Purok-1 Tagas, Daraga</p>
         </div>
 
+        @if(isset($order))
         <div class="mt-4">
-          <h2 class="text-lg font-semibold">Your Receipt</h2>
-          <p>Order# 12345</p>
+            <h2 class="text-lg font-semibold">Your Receipt</h2>
+            <p>Order# {{ sprintf('%03d', $order->id) }}</p> <!-- Order# starts at 001 -->
+
+            <ul class="mt-2 space-y-2">
+                @foreach ($order->items as $item)
+                    <li class="p-2 bg-gray-100 rounded">
+                        <strong>{{ $item->name }}</strong> - ₱{{ number_format($item->price, 2) }} x {{ $item->quantity }}
+                    </li>
+                @endforeach
+            </ul>
+
+            <p class="mt-3 font-semibold">Total: ₱{{ number_format($order->total_price, 2) }}</p>
         </div>
+    @else
+        <p class="text-red-500">No order found.</p>
+    @endif
+       @if(isset($order))
+    <div class="mt-4">
+        <h2 class="text-lg font-semibold">Your Receipt</h2>
+        <p>Order# {{ sprintf('%03d', $order->id) }}</p> <!-- Order# starts at 001 -->
+
+        <ul class="mt-2 space-y-2">
+            @foreach ($order->items as $item)
+                <li class="p-2 bg-gray-100 rounded">
+                    <strong>{{ $item->name }}</strong> - ₱{{ number_format($item->price, 2) }} x {{ $item->quantity }}
+                </li>
+            @endforeach
+        </ul>
+
+        <p class="mt-3 font-semibold">Total: ₱{{ number_format($order->total_price, 2) }}</p>
+    </div>
+@else
+    <p class="text-red-500">No order found.</p>
+@endif
+
       </div>
 
       <!-- Track Order Section -->

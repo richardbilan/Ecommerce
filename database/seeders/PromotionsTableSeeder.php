@@ -1,31 +1,11 @@
 <?php
+namespace App\Models;
 
-namespace Database\Seeders;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+class Promotion extends Model {
+    use HasFactory;
 
-class PromotionsTableSeeder extends Seeder
-{
-    public function run(): void
-    {
-        DB::table('promotions')->insert([
-            [
-                'code_name' => 'SUPEROHAH',
-                'discount' => 10.00,
-                'expiration_date' => '2025-01-02',
-                'status' => 'Active',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'code_name' => 'COFFEELOVER',
-                'discount' => 15.00,
-                'expiration_date' => '2025-05-01',
-                'status' => 'Active',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ]);
-    }
+    protected $fillable = ['code_name', 'discount', 'expiration_date', 'status'];
 }

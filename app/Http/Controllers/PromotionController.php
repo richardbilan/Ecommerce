@@ -1,116 +1,53 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use App\Models\Promotion;
+
 use Illuminate\Http\Request;
+use App\Models\Promotion;
 
 class PromotionController extends Controller
 {
-    /**
-     * Display a listing of active promotions (for user home page).
-     */
-    public function index()
-    {
-        // Fetch active and non-expired promotions
-        $promotions = Promotion::where('status', 'Active')
-            ->where('expiration_date', '>=', now())
-            ->orderBy('expiration_date', 'asc')
-            ->get();
-
-        return view('user.home', compact('promotions'));
+    public function index() {
+        $promotions = Promotion::all();
+        return view('promotions', compact('promotions'));
     }
 
-    /**
-     * Show all promotions (for admin dashboard).
-     */
-    public function adminIndex()
-    {
-        $promotions = Promotion::orderBy('created_at', 'desc')->get();
-
-        return view('admin.promotions.index', compact('promotions'));
+    public function store(Request $request) {
+        $promo = new Promotion();
+        $promo->code_name = $request->code_name;
+        $promo->discount = $request->discount;
+        $promo->expiration_date = $request->expiration_date;
+        $promo->status = $request->status;
+        $promo->save();
+        return response()->json(['message' => 'Promotion added successfully!']);
     }
 
-    /**
-     * Store a newly created promotion (admin panel).
-     */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'code_name' => 'required|string|unique:promotions,code_name|max:50',
-            'discount' => 'required|numeric|min:1|max:100',
-            'expiration_date' => 'required|date|after_or_equal:today',
-            'status' => 'required|in:Active,Inactive',
-        ]);
-
-        Promotion::create($validated);
-
-        return redirect()->back()->with('success', 'Promotion added successfully!');
+    public function update(Request $request, $id) {
+        $promo = Promotion::findOrFail($id);
+        $promo->code_name = $request->code_name;
+        $promo->discount = $request->discount;
+        $promo->expiration_date = $request->expiration_date;
+        $promo->status = $request->status;
+        $promo->save();
+        return response()->json(['message' => 'Promotion updated successfully!']);
     }
 
-    /**
-     * Show the form for editing a promotion (optional).
-     */
-    public function edit($id)
-    {
-        $promotion = Promotion::findOrFail($id);
-
-        return view('admin.promotions.edit', compact('promotion'));
+    public function destroy($id) {
+        Promotion::findOrFail($id)->delete();
+        return response()->json(['message' => 'Promotion deleted successfully!']);
     }
+    public function checkPromo(Request $request)
+{
+    $promo = Promotion::where('code_name', $request->code)->where('status', 'Active')->first();
 
-    /**
-     * Update the specified promotion.
-     */
-    public function update(Request $request, $id)
-    {
-        $promotion = Promotion::findOrFail($id);
-
-        $validated = $request->validate([
-            'code_name' => 'required|string|max:50|unique:promotions,code_name,' . $promotion->id,
-            'discount' => 'required|numeric|min:1|max:100',
-            'expiration_date' => 'required|date|after_or_equal:today',
-            'status' => 'required|in:Active,Inactive',
-        ]);
-
-        $promotion->update($validated);
-
-        return redirect()->back()->with('success', 'Promotion updated successfully!');
-    }
-
-    /**
-     * Remove the specified promotion.
-     */
-    public function destroy($id)
-    {
-        $promotion = Promotion::findOrFail($id);
-        $promotion->delete();
-
-        return redirect()->back()->with('success', 'Promotion deleted successfully!');
-    }
-
-    /**
-     * Validate promo code during checkout (AJAX/API).
-     */
-    public function validatePromo(Request $request)
-    {
-        $code = $request->input('code');
-
-        $promo = Promotion::where('code_name', $code)
-            ->where('status', 'Active')
-            ->where('expiration_date', '>=', now())
-            ->first();
-
-        if ($promo) {
-            return response()->json([
-                'valid' => true,
-                'discount' => $promo->discount,
-                'message' => 'Promo code is valid!',
-            ]);
-        }
-
+    if ($promo) {
         return response()->json([
-            'valid' => false,
-            'message' => 'Invalid or expired promo code.',
+            'valid' => true,
+            'discount' => $promo->discount
         ]);
+    } else {
+        return response()->json(['valid' => false]);
     }
+}
+
 }

@@ -21,6 +21,7 @@
             <li><a href="{{ route('orders') }}"><i class="fas fa-clipboard-list"></i><span>Order Management</span></a></li>
             <li><a href="{{ route('delivery') }}"><i class="fas fa-truck"></i><span>Delivery Management</span></a></li>
             <li><a href="{{ route('promotions') }}"><i class="fas fa-tags"></i><span>Promotion & Discounts</span></a></li>
+
         </ul>
     </nav>
     <div class="logout">

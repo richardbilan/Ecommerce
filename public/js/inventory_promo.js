@@ -1,70 +1,65 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const modal = document.getElementById("addPromoModal");
+document.addEventListener("DOMContentLoaded", function() {
     const addPromoForm = document.getElementById("addPromoForm");
-    const promoTable = document.getElementById("promoTable"); // FIXED
+    const modalTitle = document.getElementById("modalTitle");
+    let editingPromoId = null; // Store the promo ID being edited
 
-    // Open Modal
-    window.openModal = function () {
-        modal.style.display = "block";
-    };
-
-    // Close Modal
-    window.closeModal = function () {
-        modal.style.display = "none";
-    };
-
-    // Add Promo Function
-    addPromoForm.addEventListener("submit", function (e) {
-        e.preventDefault();
-
-        // Get form values
-        const promoName = document.getElementById("promoName").value;
-        const promoDiscount = document.getElementById("promoDiscount").value;
-        const promoDate = document.getElementById("promoDate").value;
-        const promoStatus = document.getElementById("Status").value; // FIXED
-
-        // Create new row
-        const newRow = document.createElement("tr");
-        newRow.innerHTML = `
-            <td>${promoName}</td>
-            <td>${promoDiscount}</td>
-            <td>${promoDate}</td>
-            <td>${promoStatus}</td>
-            <td>
-                <i class="fas fa-edit edit-icon"></i>
-                <i class="fas fa-trash delete-icon"></i>
-            </td>
-        `;
-
-        // Append to table
-        promoTable.appendChild(newRow);
-
-        // Delete Function for New Rows
-        newRow.querySelector(".delete-icon").addEventListener("click", function () {
-            this.closest("tr").remove();
-        });
-
-        // Placeholder Edit Function
-        newRow.querySelector(".edit-icon").addEventListener("click", function () {
-            alert("Edit functionality coming soon!");
-        });
-
-        // Close Modal and Reset Form
-        closeModal();
+    // Open modal for new promo
+    function openModal() {
+        editingPromoId = null; // Reset to indicate a new entry
+        modalTitle.textContent = "Add New Discounts/Promo";
         addPromoForm.reset();
+        document.getElementById("addPromoModal").style.display = "block";
+    }
+
+    // Open modal for editing promo
+    window.editPromo = function(id, name, discount, date, status) {
+        editingPromoId = id;
+        modalTitle.textContent = "Edit Discounts/Promo";
+        document.getElementById("promoId").value = id;
+        document.getElementById("promoName").value = name;
+        document.getElementById("promoDiscount").value = discount;
+        document.getElementById("promoDate").value = date;
+        document.getElementById("promoStatus").value = status;
+        document.getElementById("addPromoModal").style.display = "block";
+    };
+
+    // Close modal
+    function closeModal() {
+        document.getElementById("addPromoModal").style.display = "none";
+    }
+
+    // Handle form submission
+    addPromoForm.addEventListener("submit", function(e) {
+        e.preventDefault(); // Prevent default form submission
+
+        const promoId = editingPromoId;
+        const url = promoId ? `/promotions/${promoId}` : "/promotions";
+        const method = promoId ? "PUT" : "POST";
+
+        fetch(url, {
+                method: method,
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content || ''
+                },
+                body: JSON.stringify({
+                    code_name: document.getElementById("promoName").value,
+                    discount: document.getElementById("promoDiscount").value,
+                    expiration_date: document.getElementById("promoDate").value,
+                    status: document.getElementById("promoStatus").value
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Server response:", data);
+                location.reload(); // Refresh page after saving
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
     });
 
-    // Delete Existing Promos
-    document.querySelectorAll(".delete-icon").forEach(icon => {
-        icon.addEventListener("click", function () {
-            this.closest("tr").remove();
-        });
-    });
-
-    // Edit Existing Promos
-    document.querySelectorAll(".edit-icon").forEach(icon => {
-        icon.addEventListener("click", function () {
-            alert("Edit functionality coming soon!");
-        });
-    });
+    // Expose functions globally
+    window.openModal = openModal;
+    window.closeModal = closeModal;
 });

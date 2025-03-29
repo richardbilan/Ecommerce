@@ -155,11 +155,7 @@ class ProductController extends Controller
     /**
      * Display the billing page with product details.
      */
-    public function billingPage($id)
-    {
-        $product = Products::findOrFail($id);
-        return view('billing', compact('product'));
-    }
+
 
     /**
      * AJAX product search for live filtering.

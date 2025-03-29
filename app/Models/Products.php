@@ -20,6 +20,8 @@ class Products extends Model
         'availability',
         'tag',
         'image', // Include 'image' if you upload images
+        'status',
+        'Description',
     ];
     public function index()
 {
