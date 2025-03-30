@@ -8,11 +8,18 @@ return new class extends Migration {
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id')->nullable(); // If user is logged in
+            $table->json('products'); // Stores product details as JSON
+            $table->integer('quantity');
+            $table->string('category');
+            $table->enum('temperature', ['hot', 'cold']);
+            $table->string('promo_code')->nullable();
+            $table->decimal('subtotal', 10, 2);
+            $table->enum('order_type', ['pickup', 'delivery']);
+            $table->decimal('delivery_fee', 10, 2)->nullable();
+            $table->decimal('promo_discount', 10, 2)->nullable();
             $table->decimal('total_amount', 10, 2);
-            $table->decimal('delivery_fee', 10, 2)->default(0.00);
-            $table->decimal('promo_discount', 10, 2)->default(0.00);
-            $table->enum('order_mode', ['pickup', 'delivery']);
-            $table->timestamp('order_time')->useCurrent();
+            $table->enum('payment_method', ['gcash', 'cash']);
             $table->timestamps();
         });
     }

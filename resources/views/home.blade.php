@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Beyouu Brew Cafeph</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -322,7 +323,8 @@
 </div>
 
 <!-- Place Order Button -->
-<a href="{{ route('deliveryuser') }}" class="block w-full mt-7 p-2 text-center bg-[#745858] text-white rounded hover:bg-[#553C26]">
+<a href="javascript:void(0);" id="placeOrderBtn"
+    class="block w-full mt-7 p-2 text-center bg-[#745858] text-white rounded hover:bg-[#553C26]">
     Place Order
 </a>
 
@@ -626,7 +628,7 @@ document.addEventListener("DOMContentLoaded", function () {
     /** ✅ INITIAL TOTAL CALCULATION **/
     updateTotal();
 });
-
+DOMContentLoaded
 
 
 </script>

@@ -11,6 +11,8 @@ use App\Http\Controllers\OrderController;
 use Illuminate\Http\Request;
 use App\Models\Order;
 
+
+
 //------------------------------------------ AUTHENTICATION ROUTES ------------------------------------------
 Route::get('/login', fn() => view('Authentication.Login'))->name('login');
 Route::get('/register', fn() => view('Authentication.Register'))->name('register');
@@ -133,5 +135,4 @@ Route::put('/promotions/{id}', [PromotionController::class, 'update'])->name('pr
 Route::delete('/promotions/{id}', [PromotionController::class, 'destroy'])->name('promotions.destroy');
 Route::get('/check-promo', [PromotionController::class, 'checkPromo']);
 
-
-Route::post('/orders', [OrderController::class, 'store']);
+Route::post('/place-order', [OrderController::class, 'store'])->name('place.order');
