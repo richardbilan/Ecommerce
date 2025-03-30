@@ -266,6 +266,56 @@
             sidebar.scrollIntoView({ behavior: 'smooth' });
         }
     }
+
+    document.addEventListener("DOMContentLoaded", function () {
+    function updateTrackOrder() {
+        const now = new Date(); // Get current time
+        let minutes = now.getMinutes();
+        let hours = now.getHours();
+
+        function formatTime(h, m) {
+            let formattedH = h % 12 || 12; // Convert to 12-hour format
+            let formattedM = m.toString().padStart(2, "0"); // Add leading zero
+            let ampm = h >= 12 ? "PM" : "AM";
+            return `${formattedH}:${formattedM} ${ampm}`;
+        }
+
+        let stages = [
+            { duration: 0, message: "Thanks for your order. We have received it and are on it!" },
+            { duration: 5, message: "Preparing your order. We are on it!" },
+            { duration: 5, message: "Delivering your order. Let's go!" },
+            { duration: 10, message: "Delivered. Enjoy your coffee!" }
+        ];
+
+        let trackOrderContainer = document.querySelector(".space-y-4");
+        trackOrderContainer.innerHTML = ""; // Clear previous content
+
+        stages.forEach((stage, index) => {
+            let startMins = minutes + (index === 0 ? 0 : stages[index - 1].duration);
+            let endMins = startMins + stage.duration;
+
+            let startH = hours + Math.floor(startMins / 60);
+            startMins = startMins % 60;
+
+            let endH = hours + Math.floor(endMins / 60);
+            endMins = endMins % 60;
+
+            let timeRange = `${formatTime(startH, startMins)} - ${formatTime(endH, endMins)}`;
+
+            let stageHTML = `
+                <div class="p-3 bg-white border rounded-lg shadow-sm">
+                    <h3 class="font-bold">${timeRange}</h3>
+                    <p class="text-sm">${stage.message}</p>
+                </div>
+            `;
+
+            trackOrderContainer.innerHTML += stageHTML;
+        });
+    }
+
+    updateTrackOrder(); // Run function on page load
+});
+
   </script>
 
 </body>

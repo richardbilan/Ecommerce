@@ -1,14 +1,29 @@
 <?php
-namespace App\Models;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Models\Order;
 
-class Order extends Model
+class OrderController extends Controller
 {
-    use HasFactory;
+    public function placeOrder(Request $request)
+    {
+        // Validate request
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'total_amount' => 'required|numeric|min:1',
+        ]);
 
-    protected $fillable = [
-        'user_id', 'order_details', 'delivery_address', 'payment_method', 'total_price', 'status'
-    ];
+        // Create order
+        $order = Order::create([
+            'user_id' => $request->user_id,
+            'total_amount' => $request->total_amount,
+            'status' => 'pending',
+        ]);
+
+        return response()->json([
+            'message' => 'Order placed successfully!',
+            'order' => $order,
+        ]);
+    }
 }
 

@@ -1,50 +1,29 @@
 <?php
-namespace App\Http\Controllers;
-
+use App\Models\Order; // Ensure the Order model exists in the App\Models namespace
 use Illuminate\Http\Request;
-use App\Models\Order;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Controller;
 
 class OrderController extends Controller
 {
-    public function store(Request $request) {
-        $cart = $request->input('cart');
+    public function placeOrder(Request $request)
+    {
+        // Validate request
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'total_amount' => 'required|numeric|min:1',
+        ]);
 
-        if (empty($cart)) {
-            return response()->json(['message' => 'Cart is empty!'], 400);
-        }
+        // Create order
+        $order = Order::create([
+            'user_id' => $request->user_id,
+            'total_amount' => $request->total_amount,
+            'status' => 'pending',
+        ]);
 
-        // Store the order in the database
-        $order = new Order();
-        $order->user_id = auth()->id(); // Assuming user authentication
-        $order->order_details = json_encode($cart);
-        $order->order_mode = $request->input('orderMode');
-        $order->payment_method = $request->input('paymentMethod');
-        $order->status = 'Pending';
-        $order->save();
-
-        session(['orderId' => $order->id]); // Store the order ID in the session
-        return response()->json(['message' => 'Order placed successfully!', 'orderId' => $order->id]);
+        return response()->json([
+            'message' => 'Order placed successfully!',
+            'order' => $order,
+        ]);
     }
-
-
-
-    use App\Models\Order;
-
-public function showDeliveryUser($orderId) {
-    // Retrieve the order by ID (ensure it exists)
-    $order = Order::with('items')->find($orderId);
-
-    // If the order doesn't exist, return an error or redirect
-    if (!$order) {
-        return back()->with('error', 'Order not found.');
-    }
-
-    // ✅ Pass the $order variable to the view
-    return view('deliveryuser', compact('order'));
 }
 
-
-
-
-}

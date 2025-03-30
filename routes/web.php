@@ -132,3 +132,6 @@ Route::post('/promotions', [PromotionController::class, 'store'])->name('promoti
 Route::put('/promotions/{id}', [PromotionController::class, 'update'])->name('promotions.update');
 Route::delete('/promotions/{id}', [PromotionController::class, 'destroy'])->name('promotions.destroy');
 Route::get('/check-promo', [PromotionController::class, 'checkPromo']);
+
+
+Route::post('/orders', [OrderController::class, 'store']);
