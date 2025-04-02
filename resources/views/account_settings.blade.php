@@ -69,131 +69,121 @@
             Chat Support
         </button>
     </header>
+<!-- Main Content -->
+<main class="w-full max-w-7xl bg-white p-6 rounded-lg shadow-lg mt-6">
 
-    <!-- Main Content -->
-    <main class="w-full max-w-7xl bg-white p-6 rounded-lg shadow-lg mt-6">
+    <!-- Personal Information Section -->
+    <section id="personal-info" class="settings-tab w-full max-w-7xl mx-auto">
+        <h2 class="text-3xl font-bold text-[#4E3629] mb-6">Personal Information</h2>
+        <div class="flex flex-col md:flex-row gap-8">
 
-        <!-- Personal Information (Default Visible) -->
-        <section id="personal-info" class="settings-tab w-full max-w-7xl mx-auto">
-            <h2 class="text-3xl font-bold text-[#4E3629] mb-6">Personal Information</h2>
-            <div class="flex flex-col md:flex-row gap-8">
-                <!-- Profile Picture -->
-                <div class="relative w-40 h-40 mx-auto md:mx-0">
-                    <img src="{{ asset('images/profile-placeholder.png') }}" class="w-full h-full rounded-full border-4 border-[#8C5A3C] shadow-md">
+            <!-- Profile Picture -->
+            <form action="{{ route('update.profile.image') }}" method="POST" enctype="multipart/form-data" class="flex flex-col items-center">
+                @csrf
+                <div class="relative w-40 h-40">
+                    <img src="{{ Auth::user()->profile_image ? asset('storage/' . Auth::user()->profile_image) : asset('images/profile-placeholder.png') }}"
+                         class="w-full h-full rounded-full border-4 border-[#8C5A3C] shadow-md" id="profilePreview">
+
+                    <!-- Upload Button -->
                     <label for="profile-pic" class="absolute bottom-2 right-2 bg-[#8C5A3C] p-2 rounded-full cursor-pointer shadow">
-                        <img src="{{ asset('images/edit-icon.png') }}" class="w-5 h-5">
+                        <img src="{{ asset('images/cameraicon.png') }}" class="w-5 h-5">
                     </label>
-                    <input type="file" id="profile-pic" class="hidden">
+
+                    <!-- Hidden File Input -->
+                    <input type="file" id="profile-pic" name="profile_image" class="hidden" accept="image/*" onchange="previewAndSubmit(this)">
+                </div>
+            </form>
+
+            <!-- User Information Form -->
+            <form action="{{ route('update.profile') }}" method="POST" class="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+                @csrf
+
+                <!-- First Name (Non-editable) -->
+                <div>
+                    <label for="first-name" class="input-label block mb-1">First Name</label>
+                    <p class="block w-full p-2 border-2 border-[#6A4028] rounded bg-gray-100 text-[#4E3629] cursor-default select-none">
+                        {{ Auth::user()->name }}
+                    </p>
                 </div>
 
-                <!-- Information Fields -->
-                <div class="w-full">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-<!-- First Name Box -->
-<div>
-    <label for="first-name" class="input-label block mb-1">First Name</label>
-    <p class="block w-full p-2 border-2 border-[#6A4028] rounded bg-gray-100 text-[#4E3629] cursor-default select-none">
-        {{ Auth::user()->name }}
-    </p>
-</div>
-                        <div>
-                            <label for="last-name" class="input-label block">Last Name</label>
-                            <input type="text" id="last-name" class="input-box w-full" placeholder="Enter your last name"
-                                style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
-                        </div>
-                        <div>
-                            <label class="input-label block">Birthdate</label>
-                            <input type="date" class="input-box w-full" placeholder="Select your birthdate"
-                                style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
-                        </div>
-                        <div>
-                            <label class="input-label block">Email</label>
-                            <input type="email" class="input-box w-full" placeholder="Enter your email address"
-                                style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
-                        </div>
-                        <div>
-                            <label class="input-label block">Phone Number</label>
-                            <input type="tel" class="input-box w-full" placeholder="Enter your phone number"
-                                style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
-                        </div>
-                        <div>
-                            <label class="input-label block">Gender</label>
-                            <select class="input-box w-full"
-                            style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
-                                <option disabled selected>Select your gender</option>
-                                <option>Male</option>
-                                <option>Female</option>
-                                <option>Other</option>
-                            </select>
-                        </div>
-                    </div>
-
-                <h2 class="text-2xl font-bold text-[#4E3629] mt-6">Settings and Privacy</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Change Password Section -->
+                <!-- Last Name -->
                 <div>
-                    <label class="input-label block mt-3">Current Password</label>
-                    <input type="password" id="current-password" class="input-box w-full" placeholder="Enter current password"
-                        style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
-                        <button id="forgot-password" class="bg-gray-500 text-white px-3 py-1 rounded-lg mt-2">Forgot Password?</button>
-                </div>
-                <div>
-                    <label class="input-label block mt-6">New Password</label>
-                    <input type="password" id="new-password" class="input-box w-full" placeholder="Enter new password"
+                    <label class="input-label block">Last Name</label>
+                    <input type="text" name="last_name" class="input-box w-full"
+                        value="{{ auth()->user()->last_name }}" placeholder="Enter your last name"
                         style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
                 </div>
+
+                <!-- Birthdate -->
                 <div>
-                    <label class="input-label block">Confirm New Password</label>
-                    <input type="password" id="confirm-password" class="input-box w-full" placeholder="Confirm new password"
+                    <label class="input-label block">Birthdate</label>
+                    <input type="date" name="birthdate" class="input-box w-full"
+                        value="{{ auth()->user()->birthdate }}"
                         style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
                 </div>
-            <button id="save-password" class="bg-[#8C5A3C] text-white px-6 py-2 rounded-lg mt-4">Save Password</button>
 
-
-        <!-- Change Password Modal -->
-            <div id="password-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-                    <p class="text-lg font-bold">Changed Password Confirmed</p>
-                    <button id="close-modal" class="bg-[#8C5A3C] text-white px-4 py-2 rounded-lg mt-4 mx-auto block">OK</button>
+                <!-- Email (Non-editable) -->
+                <div>
+                    <label class="input-label block">Email</label>
+                    <input type="email" class="input-box w-full" value="{{ auth()->user()->email }}" disabled
+                        style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
                 </div>
-            </div>
 
-        <!-- Forgot Password Modals -->
-            <div id="forgot-password-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-                    <p class="text-lg font-bold">Enter your email to receive a verification code</p>
-                    <input type="email" id="reset-email" class="input-box w-full my-2" placeholder="Enter your email" style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
-                    <button id="send-code" class="bg-[#8C5A3C] text-white px-4 py-2 rounded-lg">Send Code</button>
+                <!-- Phone Number -->
+                <div>
+                    <label class="input-label block">Phone Number</label>
+                    <input type="tel" name="phone_number" class="input-box w-full"
+                        value="{{ auth()->user()->phone_number }}" placeholder="Enter your phone number"
+                        style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
                 </div>
-            </div>
 
-            <div id="input-code-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-                    <p class="text-lg font-bold">Enter the verification code sent to your email</p>
-                    <input type="text" id="verification-code" class="input-box w-full my-2" placeholder="Enter code" style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
-                    <button id="verify-code" class="bg-[#8C5A3C] text-white px-4 py-2 rounded-lg">Verify Code</button>
+                <!-- Gender -->
+                <div>
+                    <label class="input-label block">Gender</label>
+                    <select name="gender" class="input-box w-full"
+                        style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
+                        <option disabled>Select your gender</option>
+                        <option value="Male" {{ auth()->user()->gender == 'Male' ? 'selected' : '' }}>Male</option>
+                        <option value="Female" {{ auth()->user()->gender == 'Female' ? 'selected' : '' }}>Female</option>
+                        <option value="Other" {{ auth()->user()->gender == 'Other' ? 'selected' : '' }}>Other</option>
+                    </select>
                 </div>
-            </div>
 
-            <div id="new-password-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-                    <p class="text-lg font-bold">Enter your new password</p>
-                    <input type="password" id="reset-new-password" class="input-box w-full my-2" placeholder="New password" style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
-                    <input type="password" id="reset-confirm-password" class="input-box w-full my-2" placeholder="Confirm new password" style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
-                    <button id="save-new-password" class="bg-[#8C5A3C] text-white px-4 py-2 rounded-lg">Save New Password</button>
+                <!-- Save Changes Button -->
+                <div class="col-span-1 md:col-span-2 flex justify-end">
+                    <button type="submit" class="bg-[#8C5A3C] text-white p-3 rounded mt-4 w-full md:w-auto">
+                        Save Changes
+                    </button>
                 </div>
-            </div>
+            </form>
 
-            <div id="password-saved-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-                    <p class="text-lg font-bold">Password Changes Saved</p>
-                    <button id="close-saved-modal" class="bg-[#8C5A3C] text-white px-4 py-2 rounded-lg mt-4 mx-auto block">OK</button>
-                </div>
-            </div>
-            </div>
-</div>
-</div>
-        </section>
+        </div>
+
+
+
+
+<form action="{{ route('update.password') }}" method="POST">
+    @csrf
+    <div>
+        <label class="input-label block mt-3">Current Password</label>
+        <input type="password" name="current_password" class="input-box w-full" placeholder="Enter current password"
+            style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
+    </div>
+    <div>
+        <label class="input-label block mt-6">New Password</label>
+        <input type="password" name="new_password" class="input-box w-full" placeholder="Enter new password"
+            style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
+    </div>
+    <div>
+        <label class="input-label block">Confirm New Password</label>
+        <input type="password" name="new_password_confirmation" class="input-box w-full" placeholder="Confirm new password"
+            style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
+    </div>
+    <button type="submit" class="bg-[#8C5A3C] text-white px-6 py-2 rounded-lg mt-4">Save Password</button>
+</form>
+</section>
+
+</main>
 
         <!-- Transaction History (Hidden by Default) -->
         <section id="transaction-history" class="settings-tab hidden">
@@ -225,96 +215,6 @@
         </section>
     </main>
 </div>
-
-
-
-    <!-- Right Sidebar (Billing) -->
-    <aside id="rightSidebar" class="fixed right-0 top-0 w-80 bg-[#EADBC8] h-full shadow-lg transform translate-x-full transition-transform duration-300 p-4">
-    <!-- Close Button -->
-    <button id="closeSidebar" class="mb-4">
-        <img src="{{ asset('images/close.png') }}" alt="Close Icon" class="w-6 h-6">
-    </button>
-
-
-    <!-- Billing Header -->
-    <h2 class="text-xl font-bold mb-4">Billings</h2>
-
-    <!-- Cart Items -->
-    <div id="cartItems" class="space-y-4">
-        <!-- Example Cart Item -->
-        <div class="bg-white p-3 rounded shadow-md">
-            <div class="flex justify-between items-center">
-            <div>
-                <h3 class="font-semibold">Americano <span class="text-sm text-gray-500">(Cold, Tall)</span></h3>
-                <p class="text-sm">₱ 28</p>
-            </div>
-            <button>
-                <img src="{{ asset('images/close.png') }}" alt="Remove Item" class="w-5 h-5">
-            </button>
-            </div>
-
-            <div class="flex justify-between items-center mt-2">
-    <!-- Heart Button -->
-        <button id="favoriteBtn" class="text-gray-500 transition-colors duration-300">
-            <svg id="heartIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21l-1.45-1.316C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.184L12 21z"/>
-            </svg>
-        </button>
-
-        <!-- Quantity Buttons -->
-        <div class="flex items-center space-x-2">
-            <button id="decreaseBtn" class="bg-gray-300 px-2 py-1 rounded">-</button>
-            <span id="quantity" class="w-6 text-center">1</span>
-            <button id="increaseBtn" class="bg-gray-300 px-2 py-1 rounded">+</button>
-        </div>
-    </div>
-    </div>
-    </div>
-        <!-- can add more items -->
-    </div>
-
-    <!-- Order Summary -->
-    <div class="mt-2 border-t pt-2">
-        <div class="flex justify-between">
-            <span>Delivery Fee</span>
-            <span>₱ 888</span>
-        </div>
-        <div class="flex justify-between">
-            <span>Promo</span>
-            <span>₱ 28</span>
-        </div>
-        <div class="flex justify-between font-bold border-t mt-2 pt-2">
-            <span>Total</span>
-            <span>₱ 28</span>
-        </div>
-    </div>
-
-    <!-- Mode of Order -->
-    <div class="mt-6">
-        <label class="block font-bold">Mode of order</label>
-        <select id="orderMode" class="w-full p-2 border rounded bg-white text-black text-center appearance-none">
-            <option value="delivery">🚚 Delivery</option>
-            <option value="pickup">🏠 Pick Up</option>
-        </select>
-        <button id="locationBtn" class="w-full mt-2 p-2 bg-white text-black border rounded">Enter Your Location</button>
-    </div>
-
-    <!-- Payment Method -->
-    <div class="mt-6">
-    <label class="block font-bold">Payment Method</label>
-    <div class="flex justify-between mt-2">
-        <button class="w-1/2 p-2 bg-white text-black border border-gray-500 rounded transition-colors duration-300 hover:bg-[#745858] hover:text-white">
-            Gcash
-        </button>
-        <button class="w-1/2 p-2 bg-white text-black border border-gray-500 rounded ml-2 transition-colors duration-300 hover:bg-[#745858] hover:text-white">
-            Cash
-        </button>
-    </div>
-</div>
-
-    <!-- Place Order Button -->
-    <button class="w-full mt-7 p-2 bg-[#745858] text-white rounded">Place Order</button>
-</aside>
 
     <script>
         document.getElementById('billingBtn').addEventListener('click', function(event) {
@@ -501,6 +401,17 @@ document.getElementById("save-password").addEventListener("click", function () {
         document.getElementById("password-saved-modal").classList.add("hidden");
     });
 
+
+    function previewAndSubmit(input) {
+        if (input.files && input.files[0]) {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('profilePreview').src = e.target.result;
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+        input.form.submit();
+    }
     </script>
 
 </body>

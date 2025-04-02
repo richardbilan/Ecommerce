@@ -3,45 +3,43 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Order;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
     public function store(Request $request)
     {
+        // Log the incoming request for debugging
+        Log::info('Order Request Data:', $request->all());
+
+        // Validate the request
         $validatedData = $request->validate([
-            'products'       => 'required|array|min:1',
-            'quantity'       => 'required|integer|min:1',
-            'category'       => 'required|string|max:255',
-            'temperature'    => 'required|in:hot,cold',
-            'promo_code'     => 'nullable|string|max:50',
-            'subtotal'       => 'required|numeric|min:0',
-            'order_type'     => 'required|in:pickup,delivery',
-            'promo_discount' => 'nullable|numeric|min:0',
-            'total_amount'   => 'required|numeric|min:0',
-            'payment_method' => 'required|in:gcash,cash'
+            'items' => 'required|array',
+            'order_mode' => 'required|string',
+            'subtotal' => 'required|numeric',
+            'delivery_fee' => 'required|numeric',
+            'discount' => 'required|numeric',
+            'total' => 'required|numeric',
+            'payment_method' => 'required|string',
         ]);
 
-        // Calculate delivery fee
-        $delivery_fee = ($validatedData['order_type'] == 'delivery') ? 50.00 : 0.00;
-
+        // Store the order in the database
         $order = Order::create([
-            'user_id'        => auth()->id(), // Store logged-in user ID
-            'products'       => json_encode($validatedData['products']),
-            'quantity'       => $validatedData['quantity'],
-            'category'       => $validatedData['category'],
-            'temperature'    => $validatedData['temperature'],
-            'promo_code'     => $validatedData['promo_code'],
-            'subtotal'       => $validatedData['subtotal'],
-            'order_type'     => $validatedData['order_type'],
-            'delivery_fee'   => $delivery_fee,
-            'promo_discount' => $validatedData['promo_discount'] ?? 0,
-            'total_amount'   => $validatedData['total_amount'] + $delivery_fee,
-            'payment_method' => $validatedData['payment_method']
+            'user_id' => auth()->id() ?? 1, // Replace with actual user ID logic
+            'items' => json_encode($validatedData['items']),
+            'order_mode' => $validatedData['order_mode'],
+            'subtotal' => $validatedData['subtotal'],
+            'delivery_fee' => $validatedData['delivery_fee'],
+            'discount' => $validatedData['discount'],
+            'total' => $validatedData['total'],
+            'payment_method' => $validatedData['payment_method'],
+            'status' => 'pending',
         ]);
 
+        // Return success response
         return response()->json([
-            'message' => 'Order placed successfully!',
-            'order'   => $order
+            'success' => true,
+            'order' => $order,
         ], 201);
     }
 }

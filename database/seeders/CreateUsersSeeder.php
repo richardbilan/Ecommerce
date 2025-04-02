@@ -19,6 +19,7 @@ class CreateUsersSeeder extends Seeder
             [
                 'name' => 'Admin User',
                 'email' => 'richard@admin.com',
+                'profile_image' => 'richard profile.jpg',
                 'type' => 1, // 1 for admin
                 'password' => Hash::make('123456'),
             ],
@@ -40,7 +41,10 @@ class CreateUsersSeeder extends Seeder
             User::updateOrCreate(
                 ['email' => $user['email']], // Check if the email exists
                 $user // If exists, update; if not, create new user
+
             );
         }
+        $this->call(CreateUsersSeeder::class);
+
     }
 }

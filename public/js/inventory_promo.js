@@ -1,65 +1,80 @@
 document.addEventListener("DOMContentLoaded", function() {
+    const modal = document.getElementById("addPromoModal");
     const addPromoForm = document.getElementById("addPromoForm");
-    const modalTitle = document.getElementById("modalTitle");
-    let editingPromoId = null; // Store the promo ID being edited
+    const promoTable = document.getElementById("promoTable");
 
-    // Open modal for new promo
-    function openModal() {
-        editingPromoId = null; // Reset to indicate a new entry
-        modalTitle.textContent = "Add New Discounts/Promo";
-        addPromoForm.reset();
-        document.getElementById("addPromoModal").style.display = "block";
-    }
-
-    // Open modal for editing promo
-    window.editPromo = function(id, name, discount, date, status) {
-        editingPromoId = id;
-        modalTitle.textContent = "Edit Discounts/Promo";
-        document.getElementById("promoId").value = id;
-        document.getElementById("promoName").value = name;
-        document.getElementById("promoDiscount").value = discount;
-        document.getElementById("promoDate").value = date;
-        document.getElementById("promoStatus").value = status;
-        document.getElementById("addPromoModal").style.display = "block";
+    window.openModal = function() {
+        console.log("Opening modal");
+        modal.style.display = "block";
     };
 
-    // Close modal
-    function closeModal() {
-        document.getElementById("addPromoModal").style.display = "none";
-    }
+    window.closeModal = function() {
+        modal.style.display = "none";
+        addPromoForm.reset();
+    };
 
-    // Handle form submission
+    // Add or Edit Promo
     addPromoForm.addEventListener("submit", function(e) {
-        e.preventDefault(); // Prevent default form submission
+        e.preventDefault();
 
-        const promoId = editingPromoId;
-        const url = promoId ? `/promotions/${promoId}` : "/promotions";
-        const method = promoId ? "PUT" : "POST";
+        const url = "/promotions"; // Always POST to this URL for adding promotions
+        const method = "POST"; // Always use POST for adding promotions
 
+        console.log("Form submission triggered");
+        console.log("Sending data:", {
+            code_name: document.getElementById("promoName").value,
+            discount: document.getElementById("promoDiscount").value,
+            expiration_date: document.getElementById("promoDate").value,
+            status: document.getElementById("promoStatus").value
+        });
+
+        
         fetch(url, {
-                method: method,
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content || ''
-                },
-                body: JSON.stringify({
-                    code_name: document.getElementById("promoName").value,
-                    discount: document.getElementById("promoDiscount").value,
-                    expiration_date: document.getElementById("promoDate").value,
-                    status: document.getElementById("promoStatus").value
-                })
+            method: method,
+            headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content || '' },
+            body: JSON.stringify({
+                code_name: document.getElementById("promoName").value,
+                discount: document.getElementById("promoDiscount").value,
+                expiration_date: document.getElementById("promoDate").value,
+                status: document.getElementById("promoStatus").value
             })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Server response:", data);
-                location.reload(); // Refresh page after saving
-            })
-            .catch(error => {
-                console.error("Error:", error);
-            });
+        }).then(response => {
+            console.log("Response status:", response.status);
+            if (!response.ok) {
+                console.error("Server error:", response.statusText);
+            }
+            if (!response.ok) {
+                console.error("Server error:", response.statusText);
+            }
+            return response.json();
+        }).then(data => {
+            console.log("Response from server:", data);
+            if (data.message) {
+                alert(data.message); // Alert the user with the success message
+            }
+            location.reload();
+        }).catch(error => {
+            console.error("Error:", error);
+        });
     });
 
-    // Expose functions globally
-    window.openModal = openModal;
-    window.closeModal = closeModal;
+    // Delete Promo
+    window.deletePromo = function(id) {
+        fetch(`/promotions/${id}`, { method: "DELETE", headers: { "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content } })
+            .then(() => location.reload());
+    };
+
+    // Edit Promo
+    window.editPromo = function(id) {
+        fetch(`/promotions/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("promoId").value = data.id;
+                document.getElementById("promoName").value = data.code_name;
+                document.getElementById("promoDiscount").value = data.discount;
+                document.getElementById("promoDate").value = data.expiration_date;
+                document.getElementById("promoStatus").value = data.status;
+                openModal();
+            });
+    };
 });

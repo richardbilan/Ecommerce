@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Beyouu Brew Cafeph</title>
+    <title>Beyouu Brew Cafe</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -528,6 +528,7 @@ categoryButtons.forEach((button) => {
         });
     });
 
+
     //promotion/ Discount
     document.addEventListener("DOMContentLoaded", function () {
     const applyPromoBtn = document.getElementById("applyPromoBtn");
@@ -629,7 +630,44 @@ document.addEventListener("DOMContentLoaded", function () {
     updateTotal();
 });
 DOMContentLoaded
+document.getElementById("placeOrderBtn")?.addEventListener("click", function () {
+    let cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
 
+    if (cartItems.length === 0) {
+        alert("Your cart is empty!");
+        return;
+    }
+
+    let orderData = {
+        items: cartItems,
+        order_mode: "Delivery", // Change if needed
+        subtotal: 200, // Replace with actual calculated values
+        delivery_fee: 20,
+        discount: 10,
+        total: 210,
+        payment_method: "GCash" // Replace with selected method
+    };
+
+    fetch("http://127.0.0.1:8000/api/place-order", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+        body: JSON.stringify(orderData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Order Response:", data);
+        alert("Order placed successfully!");
+        localStorage.removeItem("cartItems"); // Clear cart
+        window.location.href = "deliveryuser"; // Redirect after order
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Failed to place order. Check console for details.");
+    });
+});
 
 </script>
 

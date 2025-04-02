@@ -9,12 +9,10 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'products', 'quantity', 'category', 'temperature',
-        'promo_code', 'subtotal', 'order_type', 'delivery_fee',
-        'promo_discount', 'total_amount', 'payment_method'
+        'user_id', 'items', 'order_mode', 'subtotal', 'delivery_fee', 'discount', 'total', 'payment_method', 'status'
     ];
 
     protected $casts = [
-        'products' => 'array', // Automatically decode JSON
+        'items' => 'array', // Convert JSON to array
     ];
 }

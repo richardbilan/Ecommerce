@@ -3,8 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Contracts\View\View;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\OrderController;
@@ -135,4 +134,18 @@ Route::put('/promotions/{id}', [PromotionController::class, 'update'])->name('pr
 Route::delete('/promotions/{id}', [PromotionController::class, 'destroy'])->name('promotions.destroy');
 Route::get('/check-promo', [PromotionController::class, 'checkPromo']);
 
-Route::post('/place-order', [OrderController::class, 'store'])->name('place.order');
+
+//orders
+
+Route::post('/place-order', [OrderController::class, 'store']);
+
+
+//profile
+Route::post('/update-profile-image', [UserController::class, 'updateProfileImage'])->name('update.profile.image');
+Route::post('/update-profile', [UserController::class, 'updateProfile'])->name('update.profile');
+Route::post('/update-profile-image', [UserController::class, 'updateProfileImage'])->name('user.updateProfileImage');
+
+Route::post('/update-profile-image', [UserController::class, 'updateProfileImage'])->name('update.profile.image');
+Route::post('/update-profile', [UserController::class, 'updateProfile'])->name('update.profile');
+
+Route::post('/update-password', [UserController::class, 'updatePassword'])->name('update.password');
