@@ -25,6 +25,8 @@ class User extends Authenticatable
         'birthdate',
         'phone_number',
         'gender',
+        'latitude',
+        'longitude',
         'profile_image',
         'type',
         'location', // Add 'location' here

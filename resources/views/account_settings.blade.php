@@ -78,112 +78,131 @@
         <div class="flex flex-col md:flex-row gap-8">
 
             <!-- Profile Picture -->
-            <form action="{{ route('update.profile.image') }}" method="POST" enctype="multipart/form-data" class="flex flex-col items-center">
-                @csrf
-                <div class="relative w-40 h-40">
-                    <img src="{{ Auth::user()->profile_image ? asset('storage/' . Auth::user()->profile_image) : asset('images/profile-placeholder.png') }}"
-                         class="w-full h-full rounded-full border-4 border-[#8C5A3C] shadow-md" id="profilePreview">
+            <div class="grid md:grid-cols-3 gap-8 items-start">
+                <!-- Profile Picture Section -->
+                <div class="flex flex-col items-center">
+                    <div class="relative w-40 h-40">
+                        <img src="{{ Auth::user()->profile_image ? asset('storage/' . Auth::user()->profile_image) : asset('images/profile-placeholder.png') }}"
+                             class="w-full h-full object-cover rounded-full border-4 border-[#8C5A3C] shadow-lg" id="profilePreview">
 
-                    <!-- Upload Button -->
-                    <label for="profile-pic" class="absolute bottom-2 right-2 bg-[#8C5A3C] p-2 rounded-full cursor-pointer shadow">
-                        <img src="{{ asset('images/cameraicon.png') }}" class="w-5 h-5">
-                    </label>
-
-                    <!-- Hidden File Input -->
-                    <input type="file" id="profile-pic" name="profile_image" class="hidden" accept="image/*" onchange="previewAndSubmit(this)">
-                </div>
-            </form>
-
-            <!-- User Information Form -->
-            <form action="{{ route('update.profile') }}" method="POST" class="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
-                @csrf
-
-                <!-- First Name (Non-editable) -->
-                <div>
-                    <label for="first-name" class="input-label block mb-1">First Name</label>
-                    <p class="block w-full p-2 border-2 border-[#6A4028] rounded bg-gray-100 text-[#4E3629] cursor-default select-none">
-                        {{ Auth::user()->name }}
-                    </p>
+                        <label for="profile-pic" class="absolute bottom-2 right-2 bg-[#8C5A3C] p-2 rounded-full cursor-pointer shadow-lg hover:bg-[#6A4028] transition">
+                            <img src="{{ asset('images/cameraicon.png') }}" class="w-5 h-5">
+                        </label>
+                    </div>
                 </div>
 
-                <!-- Last Name -->
-                <div>
-                    <label class="input-label block">Last Name</label>
-                    <input type="text" name="last_name" class="input-box w-full"
-                        value="{{ auth()->user()->last_name }}" placeholder="Enter your last name"
-                        style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
-                </div>
 
-                <!-- Birthdate -->
-                <div>
-                    <label class="input-label block">Birthdate</label>
-                    <input type="date" name="birthdate" class="input-box w-full"
-                        value="{{ auth()->user()->birthdate }}"
-                        style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
-                </div>
+                <!-- User Information Form (Spanning Two Columns) -->
+                <form action="{{ route('update.profile') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    @csrf
 
-                <!-- Email (Non-editable) -->
-                <div>
-                    <label class="input-label block">Email</label>
-                    <input type="email" class="input-box w-full" value="{{ auth()->user()->email }}" disabled
-                        style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
-                </div>
+                    <!-- First Name (Non-editable) -->
+                    <div>
+                        <label class="block font-semibold">First Name</label>
+                        <input type="text" value="{{ Auth::user()->name }}" disabled
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100">
+                    </div>
 
-                <!-- Phone Number -->
-                <div>
-                    <label class="input-label block">Phone Number</label>
-                    <input type="tel" name="phone_number" class="input-box w-full"
-                        value="{{ auth()->user()->phone_number }}" placeholder="Enter your phone number"
-                        style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
-                </div>
+                    <!-- Last Name -->
+                    <div>
+                        <label class="block font-semibold">Last Name</label>
+                        <input type="text" name="last_name" value="{{ auth()->user()->last_name }}" required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                    </div>
 
-                <!-- Gender -->
-                <div>
-                    <label class="input-label block">Gender</label>
-                    <select name="gender" class="input-box w-full"
-                        style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
-                        <option disabled>Select your gender</option>
-                        <option value="Male" {{ auth()->user()->gender == 'Male' ? 'selected' : '' }}>Male</option>
-                        <option value="Female" {{ auth()->user()->gender == 'Female' ? 'selected' : '' }}>Female</option>
-                        <option value="Other" {{ auth()->user()->gender == 'Other' ? 'selected' : '' }}>Other</option>
-                    </select>
-                </div>
+                    <!-- Birthdate -->
+                    <div>
+                        <label class="block font-semibold">Birthdate</label>
+                        <input type="date" name="birthdate" value="{{ auth()->user()->birthdate }}" required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                    </div>
 
-                <!-- Save Changes Button -->
-                <div class="col-span-1 md:col-span-2 flex justify-end">
-                    <button type="submit" class="bg-[#8C5A3C] text-white p-3 rounded mt-4 w-full md:w-auto">
-                        Save Changes
+                    <!-- Email (Non-editable) -->
+                    <div>
+                        <label class="block font-semibold">Email</label>
+                        <input type="email" value="{{ auth()->user()->email }}" disabled
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100">
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div>
+                        <label class="block font-semibold">Phone Number</label>
+                        <input type="tel" name="phone_number" value="{{ auth()->user()->phone_number }}"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                    </div>
+
+                    <!-- Gender -->
+                    <div>
+                        <label class="block font-semibold">Gender</label>
+                        <select name="gender" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                            <option disabled>Select your gender</option>
+                            <option value="Male" {{ auth()->user()->gender == 'Male' ? 'selected' : '' }}>Male</option>
+                            <option value="Female" {{ auth()->user()->gender == 'Female' ? 'selected' : '' }}>Female</option>
+                            <option value="Other" {{ auth()->user()->gender == 'Other' ? 'selected' : '' }}>Other</option>
+                        </select>
+                    </div>
+
+
+
+
+                    <div style="border: 1px solid black; margin: 0 auto; padding: 20px; max-width: 600px;">
+                        <h3>IP: {{ $data->ip }}</h3>
+                        <h3>Country Name: {{ $data->countryName }}</h3>
+                        <h3>Country Code: {{ $data->countryCode }}</h3>
+                        <h3>Region Code: {{ $data->regionCode }}</h3>
+                        <h3>Region Name: {{ $data->regionName }}</h3>
+                        <h3>City Name: {{ $data->cityName }}</h3>
+                        <h3>Zipcode: {{ $data->zipCode }}</h3>
+                        <h3>Latitude: {{ $data->latitude }}</h3>
+                        <h3>Longitude: {{ $data->longitude }}</h3>
+                    </div>
+
+
+                    <!-- Save Button -->
+                    <div class="col-span-2 flex justify-end">
+                        <button type="submit"
+                                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+
+            </section>
+
+        </main>
+
+
+        <div class="w-full max-w-7xl bg-white p-6 rounded-lg shadow-lg mt-6">
+            <!-- Left: Spacer for Alignment -->
+            <div></div>
+
+            <!-- Right: Password Change Box -->
+            <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200">
+                <h2 class="text-xl font-semibold text-[#4E3629] mb-4">Change Password</h2>
+                <form action="{{ route('update.password') }}" method="POST">
+                    @csrf
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Current Password</label>
+                        <input type="password" name="current_password" class="w-full mt-1 p-2 border rounded-md focus:ring-[#6A4028] focus:border-[#6A4028]"
+                            placeholder="Enter current password">
+                    </div>
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-gray-700">New Password</label>
+                        <input type="password" name="new_password" class="w-full mt-1 p-2 border rounded-md focus:ring-[#6A4028] focus:border-[#6A4028]"
+                            placeholder="Enter new password">
+                    </div>
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-gray-700">Confirm New Password</label>
+                        <input type="password" name="new_password_confirmation" class="w-full mt-1 p-2 border rounded-md focus:ring-[#6A4028] focus:border-[#6A4028]"
+                            placeholder="Confirm new password">
+                    </div>
+                    <button type="submit" class="w-full bg-[#8C5A3C] text-white py-2 mt-4 rounded-lg hover:bg-[#6A4028]">
+                        Save Password
                     </button>
-                </div>
-            </form>
-
+                </form>
+            </div>
         </div>
 
-
-
-
-<form action="{{ route('update.password') }}" method="POST">
-    @csrf
-    <div>
-        <label class="input-label block mt-3">Current Password</label>
-        <input type="password" name="current_password" class="input-box w-full" placeholder="Enter current password"
-            style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
-    </div>
-    <div>
-        <label class="input-label block mt-6">New Password</label>
-        <input type="password" name="new_password" class="input-box w-full" placeholder="Enter new password"
-            style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
-    </div>
-    <div>
-        <label class="input-label block">Confirm New Password</label>
-        <input type="password" name="new_password_confirmation" class="input-box w-full" placeholder="Confirm new password"
-            style="color: #4E3629; padding: 10px; border-radius: 5px; border: 2px solid #6A4028;">
-    </div>
-    <button type="submit" class="bg-[#8C5A3C] text-white px-6 py-2 rounded-lg mt-4">Save Password</button>
-</form>
-</section>
-
-</main>
 
         <!-- Transaction History (Hidden by Default) -->
         <section id="transaction-history" class="settings-tab hidden">
@@ -412,6 +431,42 @@ document.getElementById("save-password").addEventListener("click", function () {
         }
         input.form.submit();
     }
+
+
+    function getUserLocation() {
+    if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            document.getElementById("latitude").value = position.coords.latitude;
+            document.getElementById("longitude").value = position.coords.longitude;
+        }, function(error) {
+            alert("Error getting location: " + error.message);
+        });
+    } else {
+        alert("Geolocation is not supported by this browser.");
+    }
+}
+
+function saveLocation() {
+    const latitude = document.getElementById("latitude").value;
+    const longitude = document.getElementById("longitude").value;
+
+    if (!latitude || !longitude) {
+        alert("Please enter or detect your location first.");
+        return;
+    }
+
+    fetch("/update-location", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({ latitude, longitude })
+    })
+    .then(response => response.json())
+    .then(data => alert(data.message))
+    .catch(error => console.error("Error:", error));
+}
     </script>
 
 </body>

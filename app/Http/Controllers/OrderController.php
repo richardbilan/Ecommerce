@@ -3,43 +3,39 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Order;
-use Illuminate\Support\Facades\Log;
-
+use App\Models\UserOrder;
+use Illuminate\Support\Facades\Auth;
 class OrderController extends Controller
 {
+
+
+
     public function store(Request $request)
     {
-        // Log the incoming request for debugging
-        Log::info('Order Request Data:', $request->all());
-
-        // Validate the request
-        $validatedData = $request->validate([
-            'items' => 'required|array',
-            'order_mode' => 'required|string',
-            'subtotal' => 'required|numeric',
-            'delivery_fee' => 'required|numeric',
-            'discount' => 'required|numeric',
-            'total' => 'required|numeric',
-            'payment_method' => 'required|string',
+        $request->validate([
+            'items' => 'required',
+            'payment_method' => 'required',
+            'total_amount' => 'required|numeric',
         ]);
 
-        // Store the order in the database
-        $order = Order::create([
-            'user_id' => auth()->id() ?? 1, // Replace with actual user ID logic
-            'items' => json_encode($validatedData['items']),
-            'order_mode' => $validatedData['order_mode'],
-            'subtotal' => $validatedData['subtotal'],
-            'delivery_fee' => $validatedData['delivery_fee'],
-            'discount' => $validatedData['discount'],
-            'total' => $validatedData['total'],
-            'payment_method' => $validatedData['payment_method'],
-            'status' => 'pending',
-        ]);
+        $items = json_decode($request->items, true);
+        $firstItem = $items[0]; // assuming one item for now
 
-        // Return success response
-        return response()->json([
-            'success' => true,
-            'order' => $order,
-        ], 201);
+
+UserOrder::create([
+    'user_id'        => Auth::id(),
+    'user_name'      => Auth::user()->name, // 👈 Add this line
+    'name'           => $firstItem['name'],
+    'price'          => $firstItem['price'],
+    'quantity'       => $firstItem['quantity'],
+    'payment_method' => $request->payment_method,
+    'total_amount'   => $request->total_amount,
+    'items'          => $items, // if you're keeping this too
+]);
+
+        return redirect('deliveryuser')->with('success', 'Order placed successfully!');
     }
+
+
+
 }

@@ -125,7 +125,6 @@
         <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white" data-category="all">All</button>
         <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white" data-category="coffee series">Coffee Series</button>
         <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white" data-category="non-coffee series">Non-Coffee Series</button>
-        <button class="category-btn bg-[#EADBC8] text-black px-4 py-2 rounded hover:bg-[#745858] hover:text-white" data-category="best seller">Best Seller</button>
     </div>
 </div>
 
@@ -145,21 +144,37 @@
             <!-- Horizontal Layout: Image Left, Details Right -->
             <div class="flex flex-row items-start gap-6">
 
-                <!-- Product Image -->
-                <div class="relative">
-                    <img
-                        src="{{ asset('images/' . ($product->image ?? 'cup.png')) }}"
-                        alt="{{ $product->product_name }}"
-                        class="w-[100px] h-[144px] rounded-[10px] object-cover"
-                    />
+               <!-- Product Image -->
+               <div class="relative">
+                <img
+                    src="{{ asset('images/' . ($product->image ?? 'cup.png')) }}"
+                    alt="{{ $product->product_name }}"
+                    class="w-[100px] h-[144px] rounded-[10px] object-cover"
+                />
 
-                    <!-- Best Seller Badge -->
-                    @if ($product->is_best_seller ?? false)
-                        <span class="absolute bottom-[-10px] left-1/2 transform -translate-x-1/2 bg-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-lg shadow-md">
-                            Best Seller
-                        </span>
-                    @endif
-                </div>
+                <!-- Best Selling Tag -->
+                @if ($product->tag === 'Best Seller')
+                    <div class="absolute top-[-10px] left-[-40px] rotate-[330deg] bg-yellow-500 text-white text-xs font-bold px-5 py-1 rounded-md shadow-md">
+                        Best Selling
+                    </div>
+                @endif
+
+                <!-- New Tag -->
+                @if ($product->tag === 'New')
+                    <div class="absolute top-[-10px] left-[-40px] rotate-[0deg] bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-md shadow-md">
+                        New
+                    </div>
+                @endif
+
+                <!-- Heart Favorite Button -->
+                <button
+                    class="absolute bottom-[-10px] left-1/2 transform -translate-x-1/2 text-gray-400 hover:text-red-500 transition"
+                    onclick="toggleFavorite({{ $product->id }}, this)">
+                    <i class="fas fa-heart"></i>
+                </button>
+            </div>
+
+
 
                 <!-- Product Info -->
                 <div class="flex flex-col justify-between h-full flex-1">
@@ -317,16 +332,29 @@
 <div class="mt-6">
     <label class="block font-bold mb-2">Payment Method</label>
     <div class="flex justify-between mt-2">
-        <button class="payment-btn w-1/2 p-2 bg-white text-black border border-gray-500 rounded hover:bg-[#745858] hover:text-white" data-method="Gcash">Gcash</button>
-        <button class="payment-btn w-1/2 p-2 bg-white text-black border border-gray-500 rounded hover:bg-[#745858] hover:text-white ml-2" data-method="Cash">Cash</button>
+        <button
+            class="payment-btn w-1/2 p-2 bg-white text-black border border-gray-500 rounded hover:bg-[#745858] hover:text-white"
+            onclick="selectPayment(this)">
+            Gcash
+        </button>
+
+        <button
+            class="payment-btn w-1/2 p-2 bg-white text-black border border-gray-500 rounded hover:bg-[#745858] hover:text-white ml-2"
+            onclick="selectPayment(this)">
+            Cash
+        </button>
     </div>
 </div>
 
-<!-- Place Order Button -->
-<a href="javascript:void(0);" id="placeOrderBtn"
-    class="block w-full mt-7 p-2 text-center bg-[#745858] text-white rounded hover:bg-[#553C26]">
-    Place Order
-</a>
+
+<form action="{{ route('orders.store') }}" method="POST" id="orderForm">
+    @csrf
+    <input type="hidden" name="items" id="itemsInput">
+    <input type="hidden" name="payment_method" id="paymentMethodInput">
+    <input type="hidden" name="total_amount" id="totalAmountInput">
+    <button type="submit" id="placeOrderBtn">Place Order</button>
+</form>
+
 
 
 
@@ -629,45 +657,89 @@ document.addEventListener("DOMContentLoaded", function () {
     /** ✅ INITIAL TOTAL CALCULATION **/
     updateTotal();
 });
-DOMContentLoaded
-document.getElementById("placeOrderBtn")?.addEventListener("click", function () {
-    let cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
 
-    if (cartItems.length === 0) {
-        alert("Your cart is empty!");
-        return;
-    }
-
-    let orderData = {
-        items: cartItems,
-        order_mode: "Delivery", // Change if needed
-        subtotal: 200, // Replace with actual calculated values
-        delivery_fee: 20,
-        discount: 10,
-        total: 210,
-        payment_method: "GCash" // Replace with selected method
-    };
-
-    fetch("http://127.0.0.1:8000/api/place-order", {
+//favorite
+function toggleFavorite(productId, element) {
+    fetch(`/favorite/${productId}`, {
         method: "POST",
         headers: {
+            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             "Content-Type": "application/json",
-            "Accept": "application/json"
         },
-        body: JSON.stringify(orderData)
     })
     .then(response => response.json())
     .then(data => {
-        console.log("Order Response:", data);
-        alert("Order placed successfully!");
-        localStorage.removeItem("cartItems"); // Clear cart
-        window.location.href = "deliveryuser"; // Redirect after order
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        alert("Failed to place order. Check console for details.");
+        if (data.status === "added") {
+            element.classList.add("text-red-500");
+            element.classList.remove("text-gray-400");
+        } else {
+            element.classList.add("text-gray-400");
+            element.classList.remove("text-red-500");
+        }
+    });
+}
+
+
+
+  function selectPayment(selectedBtn) {
+        // Remove highlight from all buttons
+        document.querySelectorAll('.payment-btn').forEach(btn => {
+            btn.classList.remove('bg-[#745858]', 'text-white');
+            btn.classList.add('bg-white', 'text-black');
+        });
+
+        // Add highlight to the selected button
+        selectedBtn.classList.remove('bg-white', 'text-black');
+        selectedBtn.classList.add('bg-[#745858]', 'text-white');
+    }
+
+    document.getElementById("placeOrderBtn").addEventListener("click", function (e) {
+    const cartItems = [];
+
+    document.querySelectorAll(".cart-item").forEach(item => {
+        const name = item.querySelector("h3")?.innerText || 'Unknown';
+        const price = parseFloat(item.getAttribute("data-price"));
+        const quantity = parseInt(item.querySelector(".quantity").textContent);
+
+        cartItems.push({
+            name,
+            price,
+            quantity
+        });
+    });
+
+    // Insert values into hidden inputs
+    document.getElementById("itemsInput").value = JSON.stringify(cartItems);
+    document.getElementById("totalAmountInput").value = document.getElementById("totalAmount").textContent.replace("₱", "").trim();
+});
+
+document.querySelectorAll(".payment-btn").forEach(button => {
+    button.addEventListener("click", function () {
+        // Highlight selected button
+        document.querySelectorAll(".payment-btn").forEach(btn => btn.classList.remove("bg-blue-500", "text-white"));
+        this.classList.add("bg-blue-500", "text-white");
+
+        // Set the value
+        document.getElementById("paymentMethodInput").value = this.textContent.trim();
     });
 });
+
+const orderData = {
+    items: cartItems, // Ensure this is an array and not a string
+    payment_method: selectedPaymentMethod,
+    total_amount: totalAmount
+};
+
+// Sending data using an AJAX request
+fetch("/place-order", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+    },
+    body: JSON.stringify(orderData),
+});
+
 
 </script>
 

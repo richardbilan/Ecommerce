@@ -8,18 +8,17 @@ return new class extends Migration {
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->nullable(); // Store the user who made the order (optional)
-            $table->json('items'); // Store cart items as JSON
-            $table->string('order_mode'); // Pickup or Delivery
-            $table->decimal('subtotal', 10, 2);
-            $table->decimal('delivery_fee', 10, 2)->default(0);
-            $table->decimal('discount', 10, 2)->default(0);
-            $table->decimal('total', 10, 2);
-            $table->string('payment_method'); // GCash or Cash
-            $table->string('status')->default('Pending'); // Order status
+            $table->json('items');
+            $table->enum('order_mode', ['delivery', 'pickup'])->default('pickup');
+            $table->decimal('discount', 8, 2)->default(0); // Discount field
+            $table->string('payment_method');
+            $table->decimal('total_amount', 10, 2);
             $table->timestamps();
+
         });
     }
+
+
 
     public function down(): void
     {

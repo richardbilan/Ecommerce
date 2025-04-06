@@ -1,17 +1,16 @@
 <?php
-namespace App\Http\Controllers;
 
+namespace App\Http\Controllers;
+use Stevebauman\Location\Facades\Location as LocationFacade;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
-
+use App\Models\User;
 
 class UserController extends Controller
 {
-
     public function updateProfile(Request $request)
     {
         // Validate the request
@@ -37,25 +36,48 @@ class UserController extends Controller
         return back()->with('success', 'Profile updated successfully.');
     }
 
-public function updatePassword(Request $request)
-{
-    $request->validate([
-        'current_password' => 'required',
-        'new_password' => 'required|min:8|confirmed',
-    ]);
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|min:8|confirmed',
+        ]);
 
-    $user = Auth::user();
+        $user = Auth::user();
 
-    if (!Hash::check($request->current_password, $user->password)) {
-        throw ValidationException::withMessages(['current_password' => 'Current password is incorrect.']);
+        if (!Hash::check($request->current_password, $user->password)) {
+            throw ValidationException::withMessages(['current_password' => 'Current password is incorrect.']);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->new_password),
+        ]);
+
+        return back()->with('success', 'Password updated successfully.');
     }
 
-    $user->update([
-        'password' => Hash::make($request->new_password),
-    ]);
+    public function updateProfileImage(Request $request)
+    {
+        $request->validate([
+            'profile_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
 
-    return back()->with('success', 'Password updated successfully.');
+        $user = Auth::user();
+
+        // Delete old image if exists
+        if ($user->profile_image) {
+            Storage::delete('public/profile_images/' . $user->profile_image);
+        }
+
+        // Upload new image
+        $imageName = time().'.'.$request->profile_image->extension();
+        $request->profile_image->storeAs('public/profile_images', $imageName);
+
+        // Update user record
+        $user->update(['profile_image' => $imageName]);
+
+        return back()->with('success', 'Profile image updated successfully.');
+    }
+
+
 }
-}
-
-

@@ -7,8 +7,23 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\LocationController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\GCashController;
+
+Route::post('/pay-with-gcash', [PaymentController::class, 'payWithGCash'])->name('pay.gcash');
+Route::get('/payment-success', function () {
+    return 'Payment Successful!';
+});
+Route::get('/payment-failed', function () {
+    return 'Payment Failed!';
+});
+
 use Illuminate\Http\Request;
 use App\Models\Order;
+
+use App\Http\Controllers\ProfileController;
 
 
 
@@ -100,30 +115,15 @@ Route::post('/products', [ProductController::class, 'store'])->name('products.st
 Route::view('/deliveryuser', 'deliveryuser')->name('deliveryuser');
 
 //order routes
-Route::post('/place-order', [OrderController::class, 'store'])->name('place.order');
-Route::post('/place-order', [OrderController::class, 'placeOrder']);
 
-
-
-
-
-Route::post('/place-order', function (Request $request) {
-    $order = Order::create([
-        'user_id' => $request->user_id,
-        'order_details' => json_encode($request->order_details),
-        'delivery_address' => $request->delivery_address,
-        'payment_method' => $request->payment_method,
-        'total_price' => $request->total_price,
-        'status' => $request->status
-    ]);
-
-    return response()->json(['success' => true, 'order_id' => $order->id]);
-
-});
 Route::get('/deliveryuser/{orderId}', [OrderController::class, 'showReceipt']);
 Route::get('/deliveryuser/{orderId}', [OrderController::class, 'showDeliveryUser']);
 Route::get('/deliveryuser/{orderId}', [OrderController::class, 'showDeliveryUser'])->name('deliveryuser');
 
+//other routes
+Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+
+Route::post('/orders/store', [OrderController::class, 'store'])->name('orders.store');
 
 //promotions
 
@@ -135,17 +135,35 @@ Route::delete('/promotions/{id}', [PromotionController::class, 'destroy'])->name
 Route::get('/check-promo', [PromotionController::class, 'checkPromo']);
 
 
-//orders
-
-Route::post('/place-order', [OrderController::class, 'store']);
-
 
 //profile
 Route::post('/update-profile-image', [UserController::class, 'updateProfileImage'])->name('update.profile.image');
 Route::post('/update-profile', [UserController::class, 'updateProfile'])->name('update.profile');
 Route::post('/update-profile-image', [UserController::class, 'updateProfileImage'])->name('user.updateProfileImage');
 
-Route::post('/update-profile-image', [UserController::class, 'updateProfileImage'])->name('update.profile.image');
+
 Route::post('/update-profile', [UserController::class, 'updateProfile'])->name('update.profile');
 
 Route::post('/update-password', [UserController::class, 'updatePassword'])->name('update.password');
+
+
+//favorites
+
+
+Route::post('/favorite/{productId}', [FavoriteController::class, 'toggle'])->middleware('auth');
+
+
+
+Route::post('/update-profile-image', [ProfileController::class, 'updateProfileImage'])->name('update.profile.image');
+
+
+
+//location
+
+
+
+//payment
+Route::get('/pay/gcash', [GCashController::class, 'initiateGCash'])->name('gcash.pay');
+Route::get('/pay/gcash/success', [GCashController::class, 'gcashSuccess'])->name('gcash.success');
+Route::get('/pay/gcash/failed', [GCashController::class, 'gcashFailed'])->name('gcash.failed');
+
