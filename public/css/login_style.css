@@ -1,0 +1,216 @@
+/* Apply background image with dark tint */
+body {
+    background: url('../images/lnd.jpg') no-repeat center center fixed; /* Image path */
+    background-size: cover;
+    color: #fff;
+    font-family: "Georgia", serif;
+    font-weight: bold; /* For bold text */
+    position: relative;
+    overflow: hidden; /* Prevents scrolling when the background is fixed */
+    min-height: 100vh; /* Ensure body takes the full height */
+}
+
+/* Apply a darker overlay to the background image */
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5); /* Black overlay with opacity of 0.5 (adjust to your preference) */
+    z-index: -1; /* Ensures it stays behind the content */
+}
+
+/* Navbar customization */
+.navbar {
+    background: linear-gradient(135deg, #ffffff 75%, rgba(255, 237, 216, 0.74) 25%); /* Diagonal brown/white slant */
+    padding-top: 5px;
+    padding-bottom: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow to navbar */
+}
+
+.navbar-brand {
+    color: #6a3d2e; /* Brown color for brand */
+}
+
+.navbar-nav .nav-link {
+    color: #6a3d2e !important; /* Brown color for links */
+}
+
+
+/* Make form container transparent and remove padding */
+.card-body {
+    background-color: transparent; /* Make the background transparent */
+    padding: 0; /* Remove padding */
+}
+
+/* Remove background color and borders from input fields */
+input[type="text"], input[type="password"], input[type="email"], select, textarea {
+    background-color: transparent !important; /* Transparent background */
+    color: #fff; /* Keep the text color white */
+    border: 1px solid #fff; /* White border for input fields */
+    padding: 10px;
+    width: 100%;
+    margin-bottom: 15px;
+    border-radius: 5px;
+}
+
+/* Input focus styling */
+input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #9a6e53; /* Lighter brown on focus (optional) */
+}
+
+/* Form Styling (same as Login) */
+form {
+    position: relative; /* Required for positioning pseudo-element */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: linear-gradient(135deg, rgba(255, 237, 216, 0.74), rgba(255, 215, 169, 0.74));
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2); /* Added shadow */
+    margin: 30px auto;
+    width: 80%;
+    max-width: 500px;
+    border: 2px solid #6a3d2e; /* Border for form */
+}
+
+form::before {
+    content: ''; /* Empty content to create overlay */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4); /* Semi-transparent overlay */
+    z-index: -1; /* Place the overlay behind the content */
+    border-radius: 10px; /* Matches the border radius of the form */
+}
+
+
+/* Input fields inside the form */
+input[type="text"], input[type="password"], input[type="email"], select, textarea {
+    background-color: #3e1f0f; /* Dark brown background for inputs */
+    color: #fff;
+    border: 1px solid #6a3d2e; /* Brown border */
+    padding: 10px;
+    width: 100%;
+    margin-bottom: 15px;
+    border-radius: 5px;
+}
+
+input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #9a6e53; /* Lighter brown on focus */
+}
+
+/* Button styles */
+button, .btn {
+    background: linear-gradient(135deg, #3e1f0f, #6a3d2e);
+    color: #fff !important; /* White text */
+    border: 2px solid #6a3d2e; /* Brown border (stroke) */
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Add shadow to the button */
+    transition: all 0.3s ease; /* Smooth transition */
+}
+
+button:hover, .btn:hover {
+    background-color: #4f2d1f !important; /* Darker brown on hover */
+    border: 2px solid #4f2d1f; /* Darker brown border on hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4); /* Darker shadow on hover */
+}
+
+button:focus, .btn:focus {
+    outline: none !important;  /* Remove outline (blue stroke) */
+    border: 2px solid #6a3d2e !important;   /* Keep brown border */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important; /* Consistent shadow */
+}
+
+/* Additional styles for links in navbar */
+.navbar-nav .nav-link {
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .navbar-collapse {
+        background-color: rgba(255, 255, 255, 0.9);
+    }
+
+    form {
+        width: 90%;
+    }
+}
+
+/* Adjust navbar logo size */
+.navbar-brand img {
+    height: 30px; /* Adjust this to your desired height */
+}
+
+
+/* Right Column */
+.right-column {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent; /* Transparent background for the form */
+}
+
+
+/* Sidebar Styles */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -250px; /* Initially hidden */
+    width: 250px;
+    height: 100%;
+    background-color: #816d52;
+    transition: left 0.3s ease;
+    padding-top: 20px; /* Adds padding at the top */
+    margin-top: 90px; 
+}
+
+.sidebar.open {
+    left: 0; /* Show sidebar when open */
+}
+
+.sidebar-nav {
+    list-style-type: none;
+    padding: 0;
+}
+
+.sidebar-nav li {
+    padding: 15px;
+}
+
+.sidebar-nav li a {
+    color: white;
+    text-decoration: none;
+    display: block;
+}
+
+.sidebar-nav li span {
+    color: rgb(151, 98, 29);
+}
+
+/* Make Sidebar Button Smaller */
+.menu-button {
+    font-size: 20px;
+    background: none;
+    border: none;
+    color: #6a3d2e; /* Original brown color */
+    cursor: pointer;
+    padding: 10px 15px;
+}
+
+.menu-button:hover {
+    background-color: #4f2d1f; /* Darker brown on hover */
+    color: #fff; /* Change text color to white for contrast */
+}
+

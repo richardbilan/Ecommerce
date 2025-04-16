@@ -1,0 +1,277 @@
+/*==============================
+  HEADER
+==============================*/
+
+h1 {
+    padding: 20px;
+}
+
+.content {
+    flex: 1;
+    padding: 20px;
+    background-color: #ffffff;
+    height: 100vh;
+}
+
+
+/*==============================
+  INVENTORY CONTAINER
+==============================*/
+
+.inventory-list {
+    margin-left: 20px;
+    margin-top: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    width: auto;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.inventory-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    width: 100%;
+}
+
+
+/*==============================
+  TOP BAR: Search + Shop Status
+==============================*/
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+/*==============================
+  SEARCH BAR
+==============================*/
+
+.search-container {
+    margin-left: 610px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 300px;
+}
+
+.search-container input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.search-container i {
+    position: absolute;
+    right: 10px;
+    color: gray;
+}
+
+
+/*==============================
+  SHOP STATUS TOGGLE
+==============================*/
+
+.shop-status {
+    margin-left: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toggle {
+    width: 40px;
+    height: 20px;
+    appearance: none;
+    background: #ccc;
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+}
+
+.toggle:checked {
+    background: green;
+}
+
+.toggle::before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    background: white;
+    border-radius: 50%;
+    top: 1px;
+    left: 2px;
+    transition: 0.3s;
+}
+
+.toggle:checked::before {
+    left: 20px;
+}
+
+.status-label {
+    font-weight: bold;
+    color: green;
+}
+
+
+/*==============================
+  INVENTORY LIST - FULL WIDTH
+==============================*/
+
+.inventory-list {
+    margin-left: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    width: auto;
+}
+
+
+/*==============================
+  TABLE STYLING
+==============================*/
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th,
+td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background: #f5f5f5;
+}
+
+
+/*==============================
+  ICONS
+==============================*/
+
+.add-icon {
+    cursor: pointer;
+    color: green;
+}
+
+.edit-icon {
+    color: #3498db;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.delete-icon {
+    color: red;
+    cursor: pointer;
+}
+
+
+/*==============================
+  MODAL STYLING (OVERLAY)
+==============================*/
+
+.modal {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    overflow: auto;
+    /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Black with opacity */
+    padding-top: 100px;
+    /* Location of the box */
+}
+
+
+/*==============================
+  MODAL CONTENT BOX
+==============================*/
+
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 600px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+
+/*==============================
+  CLOSE BUTTON (X)
+==============================*/
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+}
+
+
+/*==============================
+  FORM INPUTS & SELECTS (INSIDE MODALS)
+==============================*/
+
+input,
+select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+
+/*==============================
+  ADD BUTTON INSIDE MODALS
+==============================*/
+
+.btn-add {
+    background-color: #a67c52;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.btn-add:hover {
+    background-color: #856644;
+}

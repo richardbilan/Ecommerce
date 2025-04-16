@@ -1,0 +1,83 @@
+.container {
+    height: auto !important;
+    min-height: 100vh;
+}
+
+.content {
+    flex: 1;
+    padding: 20px;
+    background-color: #ffffff;
+    height: 100vh;
+    overflow: hidden;
+    /* Prevent overflow */
+}
+
+.summary {
+    display: flex;
+    gap: 10px;
+}
+
+.card {
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    margin-left: 20px;
+    font-size: 14px;
+    /* Default font size for titles */
+}
+
+.card span {
+    display: block;
+    font-size: 24px;
+    /* Make values larger */
+    font-weight: bold;
+    margin-top: 5px;
+    /* Add spacing */
+}
+
+.charts {
+    display: flex;
+    gap: 10px;
+    /* Reduced gap to minimize space usage */
+    margin-top: 20px;
+    flex-wrap: wrap;
+    /* Allow charts to stack if they exceed container width */
+}
+
+.chart {
+    width: 100%;
+    /* Set to 100% to fit within the container */
+    max-width: 600px;
+    /* Set a max width for larger screens */
+    height: 300px;
+    /* Increased height for larger graphs */
+    background: #eee;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.best-selling {
+    display: flex;
+    gap: 10px;
+    /* Adds spacing between the two cards */
+    margin-top: 20px;
+}
+
+.best-selling .card {
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-size: 14px;
+    border-radius: 8px;
+    flex: 1;
+    /* Makes both cards equal width */
+}
+
+.best-selling .card span {
+    display: block;
+    font-weight: bold;
+    color: #333;
+    margin-top: 5px;
+}

@@ -1,0 +1,113 @@
+/* Import Google Font */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f3e3d2;
+}
+
+.container {
+    display: flex;
+    width: 70%;
+    background-color: #f3e3d2;
+    padding: 40px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+
+/* Logo Section */
+
+.logo {
+    width: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #4f3d32;
+}
+
+
+/* Form Section */
+
+.form-container {
+    width: 60%;
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+}
+
+h2 {
+    text-align: center;
+    color: #4f3d32;
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.password-group {
+    display: flex;
+    gap: 10px;
+}
+
+.password-group input {
+    width: 50%;
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+button {
+    padding: 12px;
+    width: 48%;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.register {
+    background-color: #6e4a39;
+    color: white;
+}
+
+.signin {
+    background-color: #d3c1b3;
+    color: #4f3d32;
+}
+
+hr {
+    margin: 20px 0;
+    border: 1px solid #ddd;
+}
+
+.social-login {
+    text-align: center;
+    font-size: 14px;
+    color: #4f3d32;
+}
