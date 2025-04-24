@@ -201,48 +201,65 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'items' => 'nullable',
-            'payment_method' => 'required',
+            'items' => 'required',
+            'payment_method' => 'required|in:cash,gcash',
             'total_amount' => 'required|numeric',
             'delivery_address' => 'required|string|max:255',
+            'user_name' => 'required|string',
+            'email' => 'required|email',
+            'phone' => 'required|string'
         ]);
 
-        // If payment method is GCash, redirect to GCash payment logic
-        if ($request->payment_method === 'gcash') {
-            // Save order data in session and redirect to GCash payment
-            session(['pending_order_data' => $request->all()]);
-            return view('gcash_redirect_form', ['data' => $request->all()]);
-        }
-
-        $items = $request->items ? json_decode($request->items, true) : null;
-        
-        // Extract item names if items exist
-        $itemNames = [];
-        if ($items) {
-            foreach ($items as $item) {
-                $itemNames[] = $item['name'];
+        try {
+            // If payment method is GCash, redirect to GCash payment logic
+            if ($request->payment_method === 'gcash') {
+                // Save order data in session and redirect to GCash payment
+                session(['pending_order_data' => $request->all()]);
+                return view('gcash_redirect_form', ['data' => $request->all()]);
             }
+
+            $items = $request->items ? json_decode($request->items, true) : null;
+            
+            // Create the order
+            $order = UserOrder::create([
+                'user_id' => Auth::id(),
+                'user_name' => $request->user_name,
+                'items' => $items,
+                'payment_method' => $request->payment_method,
+                'total_amount' => $request->total_amount,
+                'delivery_address' => $request->delivery_address,
+                'subtotal' => $request->total_amount,
+                'status' => 'pending',
+                'email' => $request->email,
+                'phone' => $request->phone
+            ]);
+
+            // Return JSON response for AJAX requests
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'order_id' => $order->id,
+                    'message' => 'Order placed successfully!'
+                ]);
+            }
+
+            // Redirect to delivery user page with the order for non-AJAX requests
+            return redirect()->route('deliveryuser', ['orderId' => $order->id])->with([
+                'success' => 'Order placed successfully!',
+                'order' => $order
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error creating order: ' . $e->getMessage());
+            
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to place order: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return back()->with('error', 'Failed to place order. Please try again.');
         }
-
-        // Create the order
-        $order = UserOrder::create([
-            'user_id' => Auth::id(),
-            'user_name' => Auth::user()->name, // Set user_name to the logged-in user's name
-            'items' => $items,
-            'payment_method' => $request->payment_method,
-            'total_amount' => $request->total_amount,
-            'delivery_address' => $request->delivery_address, // assuming 'location' is delivery address from request
-            'subtotal' => $request->total_amount, // always set subtotal to total_amount
-            // 'tax_amount' removed per schema update
-            // 'shop_address' to be handled separately
-            'status' => (string) 'pending', // Set initial status as pending
-        ]);
-
-        // Redirect to delivery user page with the order
-        return redirect()->route('deliveryuser', ['orderId' => $order->id])->with([
-            'success' => 'Order placed successfully!',
-            'order' => $order
-        ]);
     }
 
     /**
@@ -272,23 +289,41 @@ class OrderController extends Controller
 
     public function showDeliveryUser($orderId)
     {
-        $user = auth()->user();
-        $order = UserOrder::where('id', $orderId)->where('user_id', $user->id)->firstOrFail();
-        // Fetch all orders for statistics
-        $orders = UserOrder::where('user_id', $user->id)
-            ->whereNotIn('status', ['cancelled'])
-            ->orderBy('created_at', 'desc')
-            ->get();
-        $activeOrder = $orders->whereNotIn('status', ['delivered', 'cancelled'])
-            ->sortByDesc('created_at')
-            ->first();
-        $statistics = [
-            'active_orders' => $orders->whereNotIn('status', ['delivered', 'cancelled'])->count(),
-            'completed_orders' => $orders->where('status', 'delivered')->count(),
-            'total_orders' => $orders->count(),
-            'active_order' => $activeOrder
-        ];
-        return view('deliveryuser', compact('order', 'statistics'));
+        try {
+            $user = auth()->user();
+            
+            // Get all orders for the user
+            $orders = UserOrder::where('user_id', $user->id)
+                ->whereNotIn('status', ['cancelled'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            // Get the specific order if orderId is provided
+            $order = null;
+            if ($orderId) {
+                $order = $orders->where('id', $orderId)->first();
+                if (!$order) {
+                    return redirect()->route('deliveryuser')->with('error', 'Order not found.');
+                }
+            }
+
+            // Get active order (either the specific order or the most recent active one)
+            $activeOrder = $order ?? $orders->whereNotIn('status', ['delivered', 'cancelled'])
+                ->sortByDesc('created_at')
+                ->first();
+
+            $statistics = [
+                'active_orders' => $orders->whereNotIn('status', ['delivered', 'cancelled'])->count(),
+                'completed_orders' => $orders->where('status', 'delivered')->count(),
+                'total_orders' => $orders->count(),
+                'active_order' => $activeOrder
+            ];
+
+            return view('deliveryuser', compact('orders', 'order', 'statistics'));
+        } catch (\Exception $e) {
+            \Log::error('Error in showDeliveryUser: ' . $e->getMessage());
+            return redirect()->route('home')->with('error', 'Something went wrong. Please try again.');
+        }
     }
 
     public function gcashCheckout(Request $request)

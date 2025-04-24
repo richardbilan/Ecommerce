@@ -16,21 +16,6 @@ use App\Http\Controllers\CafeLocationController;
 use App\Http\Controllers\WebhookController; // added this line
 
 
-Route::post('/pay-with-gcash', [PaymentController::class, 'payWithGCash'])->name('pay.gcash');
-Route::get('/payment-success', function () {
-    return 'Payment Successful!';
-});
-Route::get('/payment-failed', function () {
-    return 'Payment Failed!';
-});
-
-use Illuminate\Http\Request;
-use App\Models\Order;
-
-use App\Http\Controllers\ProfileController;
-
-
-
 //------------------------------------------ AUTHENTICATION ROUTES ------------------------------------------
 Route::get('/login', fn() => view('Authentication.Login'))->name('login');
 Route::get('/register', fn() => view('Authentication.Register'))->name('register');
@@ -160,9 +145,6 @@ Route::post('/update-profile-image', [ProfileController::class, 'updateProfileIm
 //location
 Route::post('/update-location', [AccountController::class, 'updateLocation'])->name('update.location');
 Route::post('/orders/{order}/review', [OrderController::class, 'storeReview'])->name('orders.review');
-Route::get('/gcash-payment-return', [App\Http\Controllers\PaymentController::class, 'gcashPaymentReturn'])->name('gcash.payment.return');
-Route::get('/gcash/payment-success', [App\Http\Controllers\PaymentController::class, 'gcashPaymentSuccess'])->name('gcash.payment.success');
-Route::get('/gcash/payment-failed', [App\Http\Controllers\PaymentController::class, 'gcashPaymentFailed'])->name('gcash.payment.failed');
 
 // Add these routes in the authenticated group
 Route::middleware(['auth'])->group(function () {
@@ -180,18 +162,10 @@ Route::middleware(['auth', 'user-access:admin'])->group(function () {
 // Order placement
 Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
 
-// GCash/PayMongo payment link creation (AJAX)
-Route::post('/paymongo/gcash', [PayMongoController::class, 'payWithGCash'])->name('paymongo.gcash');
-
-// GCash redirect form handler
-Route::post('/pay-gcash-link', [App\Http\Controllers\PaymentController::class, 'payWithGCashLink'])->name('pay.gcash.link');
-
-// GCash/PayMongo payment status and callbacks (keep as needed)
-Route::get('/gcash-payment-return', [App\Http\Controllers\PaymentController::class, 'gcashPaymentReturn'])->name('gcash.payment.return');
-Route::get('/gcash/payment-success', [App\Http\Controllers\PaymentController::class, 'gcashPaymentSuccess'])->name('gcash.payment.success');
-Route::get('/gcash/payment-failed', [App\Http\Controllers\PaymentController::class, 'gcashPaymentFailed'])->name('gcash.payment.failed');
-Route::get('/gcash/callback', function () {
-    return redirect('deliveryuser')->with('success', 'Payment completed!');
-})->name('gcash.callback');
+// GCash Payment Routes
+Route::post('/pay-with-gcash', [PayMongoController::class, 'createPaymentLink'])->name('gcash.create.payment');
+Route::get('/payment/success', [PayMongoController::class, 'handlePaymentSuccess'])->name('gcash.payment.success');
+Route::get('/payment/failed', [PayMongoController::class, 'handlePaymentFailed'])->name('gcash.payment.failed');
+Route::post('/payment/verify', [PayMongoController::class, 'verifyPayment'])->name('gcash.payment.verify');
 
 Route::post('webhook-receiver', [App\Http\Controllers\WebhookController::class, 'webhook'])->name('webhook');

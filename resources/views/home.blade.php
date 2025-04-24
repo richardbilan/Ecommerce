@@ -511,16 +511,19 @@
         <label class="block font-bold mb-2">Payment Method</label>
         <div class="flex justify-between mt-2">
             <button
+                type="button"
                 class="payment-btn w-1/2 p-2 bg-white text-black border border-gray-500 rounded hover:bg-[#745858] hover:text-white"
                 onclick="selectPayment(this, 'gcash')">
                 GCash
             </button>
             <button
+                type="button"
                 class="payment-btn w-1/2 p-2 bg-white text-black border border-gray-500 rounded hover:bg-[#745858] hover:text-white ml-2"
                 onclick="selectPayment(this, 'cash')">
                 Cash
             </button>
         </div>
+        <input type="hidden" id="paymentMethodInput" name="payment_method" value="">
     </div>
 
     <!-- Place Order Button -->
@@ -957,81 +960,135 @@ function toggleFavorite(productId, element) {
     });
 }
 
+function selectPayment(button, method) {
+    // Remove highlight from all buttons
+    document.querySelectorAll('.payment-btn').forEach(btn => {
+        btn.classList.remove('bg-[#745858]', 'text-white');
+        btn.classList.add('bg-white', 'text-black');
+    });
 
+    // Add highlight to selected button
+    button.classList.remove('bg-white', 'text-black');
+    button.classList.add('bg-[#745858]', 'text-white');
 
-  function selectPayment(button, method) {
-        // Remove highlight from all buttons
-        document.querySelectorAll('.payment-btn').forEach(btn => {
-            btn.classList.remove('bg-[#745858]', 'text-white');
-            btn.classList.add('bg-white', 'text-black');
-        });
+    // Update the payment method input
+    document.getElementById('paymentMethodInput').value = method;
+    
+    // Update the payment method display in the order summary
+    const paymentMethodDisplay = document.getElementById('paymentMethodDisplay');
+    if (paymentMethodDisplay) {
+        paymentMethodDisplay.value = method === 'gcash' ? 'GCash' : 'Cash';
+    }
+}
 
-        // Add highlight to selected button
-        button.classList.remove('bg-white', 'text-black');
-        button.classList.add('bg-[#745858]', 'text-white');
+function handlePaymentProcess(event) {
+    if (event) event.preventDefault();
+    
+    const paymentMethod = document.getElementById('paymentMethodInput').value.toLowerCase();
+    const name = document.getElementById('customer_name')?.value;
+    const email = document.getElementById('customer_email')?.value;
+    const phone = document.getElementById('customer_phone')?.value;
+    const address = document.getElementById('delivery_address')?.value;
+    const totalAmount = document.getElementById('totalAmountInput').value;
+    const items = document.getElementById('itemsInput').value;
 
-        // Update the payment method input and display
-        const paymentMethodInput = document.getElementById('paymentMethodInput');
-        const paymentMethodDisplay = document.getElementById('paymentMethodDisplay');
-        
-        if (paymentMethodInput) {
-            paymentMethodInput.value = method.toLowerCase();
-        }
-        
-        if (paymentMethodDisplay) {
-            paymentMethodDisplay.value = method.charAt(0).toUpperCase() + method.slice(1);
-        }
+    if (!name || !email || !phone || !address) {
+        alert('Please fill in all required fields');
+        return;
     }
 
-    document.getElementById("placeOrderBtn").addEventListener("click", function (e) {
-    const cartItems = [];
+    if (!paymentMethod) {
+        alert('Please select a payment method');
+        return;
+    }
 
-    document.querySelectorAll(".cart-item").forEach(item => {
-    const name = item.querySelector("h3")?.innerText || 'Unknown';
-    const price = parseFloat(item.getAttribute("data-price")) || 0;
-    const quantity = parseInt(item.querySelector(".quantity").textContent) || 1;
-    const image = item.querySelector("img")?.getAttribute("src") || '';
+    // Get CSRF token from meta tag
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    if (!csrfToken) {
+        alert('CSRF token not found. Please refresh the page.');
+        return;
+    }
 
-    cartItems.push({
-        name,
-        price,
-        quantity,
-        image
-    });
-});
-
-
-    // Insert values into hidden inputs
-    document.getElementById("itemsInput").value = JSON.stringify(cartItems);
-    document.getElementById("totalAmountInput").value = document.getElementById("totalAmount").textContent.replace("₱", "").trim();
-});
-
-document.querySelectorAll(".payment-btn").forEach(button => {
-    button.addEventListener("click", function () {
-        // Highlight selected button
-        document.querySelectorAll(".payment-btn").forEach(btn => btn.classList.remove("bg-blue-500", "text-white"));
-        this.classList.add("bg-blue-500", "text-white");
-
-        // Set the value
-        document.getElementById("paymentMethodInput").value = this.textContent.trim();
-    });
-});
-
-const orderData = {
-    items: cartItems, // Ensure this is an array and not a string
-    payment_method: selectedPaymentMethod,
-    total_amount: totalAmount
-};
-
-// Sending data using an AJAX request
-fetch("/place-order", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json",
-        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
-    },
-    body: JSON.stringify(orderData),
-});
+    // Show loading state
+    const confirmButton = document.querySelector('[onclick*="handlePaymentProcess"]');
+    if (confirmButton) {
+        confirmButton.disabled = true;
+        confirmButton.textContent = 'Processing...';
+    }
+    
+    if (paymentMethod === 'gcash') {
+        // For GCash, proceed to PayMongo payment
+        fetch("/pay-with-gcash", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": csrfToken,
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({
+                total_amount: parseFloat(totalAmount),
+                name: name,
+                email: email,
+                phone: phone,
+                delivery_address: address,
+                items: items
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.checkout_url) {
+                window.location.href = data.checkout_url;
+            } else {
+                throw new Error(data.message || 'Failed to initiate payment');
+            }
+        })
+        .catch(error => {
+            console.error("Error during GCash payment:", error);
+            alert(error.message || 'Something went wrong. Please try again.');
+            if (confirmButton) {
+                confirmButton.disabled = false;
+                confirmButton.textContent = 'Proceed to Payment';
+            }
+        });
+    } else if (paymentMethod === 'cash') {
+        // For cash payment, create order and proceed to delivery user page
+        fetch("/orders", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": csrfToken,
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({
+                total_amount: parseFloat(totalAmount),
+                user_name: name,
+                email: email,
+                phone: phone,
+                delivery_address: address,
+                items: JSON.parse(items),
+                payment_method: 'cash',
+                payment_status: 'unpaid',
+                status: 'pending'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.order_id) {
+                window.location.href = `/deliveryuser/${data.order_id}`;
+            } else {
+                throw new Error(data.message || 'Failed to create order');
+            }
+        })
+        .catch(error => {
+            console.error("Error during cash order:", error);
+            alert('Something went wrong. Please try again.');
+            if (confirmButton) {
+                confirmButton.disabled = false;
+                confirmButton.textContent = 'Proceed to Payment';
+            }
+        });
+    }
+}
 
 function showOrderSummary() {
     const modal = document.getElementById('orderSummaryModal');
@@ -1055,7 +1112,7 @@ function showOrderSummary() {
     // Add each cart item to the summary
     cartItems.forEach(item => {
         const name = item.querySelector('h3').textContent.split('(')[0].trim();
-        const option = item.querySelector('h3 span')?.textContent.replace(/[()]/g, '').trim() || '';
+        const option = item.querySelector('p.text-sm.text-gray-500')?.textContent || '';
         const price = parseFloat(item.getAttribute('data-price'));
         const quantity = parseInt(item.querySelector('.quantity').textContent);
         const itemTotal = price * quantity;
@@ -1098,33 +1155,20 @@ function showOrderSummary() {
     document.getElementById('summaryDiscount').textContent = `₱${discount.toFixed(2)}`;
     document.getElementById('summaryTotal').textContent = `₱${total.toFixed(2)}`;
 
-    // Get user information from hidden fields
-    const customerName = document.getElementById('customer_name');
-    const customerEmail = document.getElementById('customer_email');
-    const customerPhone = document.getElementById('customer_phone');
-    const deliveryAddress = document.getElementById('delivery_address');
-
-    // Set user information in the form
-    if (customerName) customerName.value = document.getElementById('auth_user_name').value;
-    if (customerEmail) customerEmail.value = document.getElementById('auth_user_email').value;
-    if (customerPhone) customerPhone.value = document.getElementById('auth_user_phone').value;
-    if (deliveryAddress) deliveryAddress.value = document.getElementById('auth_user_address').value;
-
-    // Get the selected payment method from the highlighted button
+    // Get selected payment method
     const selectedPaymentBtn = document.querySelector('.payment-btn.bg-\\[\\#745858\\]');
-    const paymentMethod = selectedPaymentBtn ? selectedPaymentBtn.textContent.trim() : 'Cash';
+    const paymentMethod = selectedPaymentBtn ? selectedPaymentBtn.textContent.trim() : '';
 
-    // Update form inputs
+    // Update payment method display
+    const paymentMethodDisplay = document.getElementById('paymentMethodDisplay');
+    if (paymentMethodDisplay) {
+        paymentMethodDisplay.value = paymentMethod;
+    }
+
+    // Update hidden form inputs
     document.getElementById('itemsInput').value = JSON.stringify(items);
     document.getElementById('totalAmountInput').value = total.toFixed(2);
     document.getElementById('paymentMethodInput').value = paymentMethod.toLowerCase();
-    document.getElementById('paymentMethodDisplay').value = paymentMethod;
-    document.getElementById('locationInput').value = document.getElementById('deliveryLocation')?.value || '';
-
-    // Remove any existing event listeners from the form
-    const form = document.getElementById('orderForm');
-    const clonedForm = form.cloneNode(true);
-    form.parentNode.replaceChild(clonedForm, form);
 }
 
 function closeOrderSummary() {
@@ -1133,134 +1177,6 @@ function closeOrderSummary() {
         modal.classList.add('hidden');
     }
 }
-
-function handlePaymentProcess(event) {
-    if (event) event.preventDefault();
-    console.log('handlePaymentProcess called!');
-    const paymentMethod = document.getElementById('paymentMethodInput').value;
-    console.log('paymentMethod:', paymentMethod);
-    const name = document.getElementById('customer_name')?.value;
-    const email = document.getElementById('customer_email')?.value;
-    const phone = document.getElementById('customer_phone')?.value;
-    const address = document.getElementById('delivery_address')?.value;
-    console.log('Collected fields:', { name, email, phone, address });
-
-    if (!name || !email || !phone || !address) {
-        alert('Please fill in all required fields');
-        return;
-    }
-
-    // Show loading state
-    const confirmButton = document.querySelector('[onclick*="handlePaymentProcess"]');
-    if (confirmButton) {
-        confirmButton.disabled = true;
-        confirmButton.textContent = 'Processing...';
-    }
-    
-    if (paymentMethod === 'gcash') {
-        console.log('GCash selected, starting fetch...');
-        const totalAmount = document.getElementById('totalAmount').textContent.replace('₱', '').trim();
-        fetch("/paymongo/gcash", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
-            },
-            body: JSON.stringify({
-                total_amount: parseFloat(totalAmount),
-                name: name,
-                email: email,
-                phone: phone,
-                address: address
-            })
-        })
-        .then(response => {
-            console.log('Fetch response:', response);
-            return response.json();
-        })
-        .then(data => {
-            console.log('Fetch data:', data);
-            if (data.success && data.checkout_url) {
-                sessionStorage.setItem('order_details', JSON.stringify({
-                    name: name,
-                    email: email,
-                    phone: phone,
-                    address: address,
-                    amount: totalAmount
-                }));
-                window.location.href = data.checkout_url;
-            } else {
-                throw new Error(data.message || 'Failed to initiate payment');
-            }
-        })
-        .catch(error => {
-            console.error("Error during GCash payment:", error);
-            alert(error.message || 'Something went wrong. Please try again.');
-            if (confirmButton) {
-                confirmButton.disabled = false;
-                confirmButton.textContent = 'Proceed to Payment';
-            }
-        });
-    } else {
-        console.log('Cash selected, submitting order...');
-        submitOrder({
-            name: name,
-            email: email,
-            phone: phone,
-            address: address,
-            payment_method: 'cash'
-        });
-    }
-}
-
-function submitOrder(customerDetails) {
-    const cartItems = [];
-    document.querySelectorAll(".cart-item").forEach(item => {
-        const name = item.querySelector("h3")?.innerText.split('(')[0].trim();
-        const price = parseFloat(item.getAttribute("data-price")) || 0;
-        const quantity = parseInt(item.querySelector(".quantity").textContent) || 1;
-        const option = item.querySelector("h3 span")?.textContent.replace(/[()]/g, '').trim();
-
-        cartItems.push({
-            name,
-            price,
-            quantity,
-            option
-        });
-    });
-
-    // Update form values
-    document.getElementById("itemsInput").value = JSON.stringify(cartItems);
-    document.getElementById("totalAmountInput").value = document.getElementById("totalAmount").textContent.replace("₱", "").trim();
-    document.getElementById("paymentMethodInput").value = customerDetails.payment_method;
-    document.getElementById("locationInput").value = document.getElementById("deliveryLocation")?.value || '';
-
-    // Submit the form
-    const form = document.getElementById("orderForm");
-    form.submit();
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Place Order button click handler
-    const placeOrderBtn = document.getElementById('placeOrderBtn');
-    if (placeOrderBtn) {
-        placeOrderBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            console.log('Place Order button clicked');
-            showOrderSummary();
-        });
-    }
-
-    // Initialize other event listeners
-    const closeSidebar = document.getElementById("closeSidebar");
-    const rightSidebar = document.getElementById("rightSidebar");
-
-    if (closeSidebar && rightSidebar) {
-        closeSidebar.addEventListener("click", function() {
-            rightSidebar.classList.add("translate-x-full");
-        });
-    }
-});
 
 function getCurrentLocation() {
     if ("geolocation" in navigator) {
