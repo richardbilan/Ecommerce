@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,7 +21,7 @@
             <li><a href="{{ route('orders') }}"><i class="fas fa-clipboard-list"></i><span>Order Management</span></a></li>
             <li><a href="{{ route('delivery') }}"><i class="fas fa-truck"></i><span>Delivery Management</span></a></li>
             <li><a href="{{ route('promotions') }}"><i class="fas fa-tags"></i><span>Promotion & Discounts</span></a></li>
-
+            <li><a href="{{ route('location') }}"><i class="fas fa-location-dot"></i><span> Location Management</span></a></li>
         </ul>
     </nav>
     <div class="logout">
@@ -43,7 +42,6 @@
             @yield('content')
         </main>
     </div>
+    @stack('scripts')
 </body>
 </html>
-
-

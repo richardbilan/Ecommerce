@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Products;
+use App\Models\Product;
+use App\Models\CafeLocation;
+use App\Models\ShopStatus;
 
 class ProductController extends Controller
 {
@@ -13,16 +16,37 @@ class ProductController extends Controller
     public function index()
     {
         $products = Products::all();
-        return view('inventory', compact('products'));
+        $shopStatus = ShopStatus::getCurrentStatus();
+        $isShopOpen = $shopStatus->is_open;
+        
+        return view('inventory', compact('products', 'isShopOpen'));
     }
 
     /**
      * Display all products in the home view (optional).
      */
-    public function showProducts()
+    public function home()
     {
-        $products = Products::all();
-        return view('home', compact('products'));
+        try {
+            $products = Product::all();
+            $shopStatus = ShopStatus::getCurrentStatus();
+            $currentLocation = $shopStatus->cafeLocation;
+            
+            // Get shop status
+            $isShopOpen = $shopStatus->is_open;
+            
+            \Log::info('Shop status check - isOpen: ' . ($isShopOpen ? 'true' : 'false'));
+            
+            return view('home', compact('products', 'isShopOpen', 'currentLocation', 'shopStatus'));
+        } catch (\Exception $e) {
+            \Log::error('Error in home method: ' . $e->getMessage());
+            return view('home', [
+                'products' => collect([]),
+                'isShopOpen' => false,
+                'currentLocation' => null,
+                'shopStatus' => null
+            ]);
+        }
     }
 
     /**

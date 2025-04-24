@@ -36,5 +36,10 @@ return [
     'redirect_url' => env('PAYMONGO_REDIRECT_URL'),
 ],
 
+    'google' => [
+        'maps' => [
+            'api_key' => env('GOOGLE_MAPS_API_KEY'),
+        ],
+    ],
 
 ];

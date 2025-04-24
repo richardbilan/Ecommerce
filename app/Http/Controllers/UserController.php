@@ -8,32 +8,93 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class UserController extends Controller
 {
     public function updateProfile(Request $request)
     {
-        // Validate the request
-        $request->validate([
-            'last_name' => 'required|string|max:255',
-            'birthdate' => 'required|date',
-            'phone_number' => 'nullable|string|max:20',
-            'gender' => 'required|string|in:Male,Female,Other',
+        // Debug logging for request data
+        \Log::info('Received profile update request', [
+            'all_data' => $request->all(),
+            'content_type' => $request->header('Content-Type')
         ]);
 
-        // Get the authenticated user
-        $user = Auth::user();
+        try {
+            // Get the authenticated user
+            $user = Auth::user();
+            
+            if (!$user) {
+                \Log::error('No authenticated user found');
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not authenticated'
+                ], 401);
+            }
 
-        // Update user data
-        $user->update([
-            'last_name' => $request->last_name,
-            'birthdate' => $request->birthdate,
-            'phone_number' => $request->phone_number,
-            'gender' => $request->gender,
-        ]);
+            // If only location is being updated
+            if ($request->has('location') && count($request->all()) === 1) {
+                $validated = $request->validate([
+                    'location' => 'required|string|max:255',
+                ]);
+            } else {
+                // Full profile update
+                $validated = $request->validate([
+                    'last_name' => 'required|string|max:255',
+                    'birthdate' => 'required|date',
+                    'phone_number' => 'nullable|string|max:20',
+                    'gender' => 'required|string|in:Male,Female,Other',
+                    'location' => 'required|string|max:255',
+                ]);
+            }
 
-        // Redirect with success message
-        return back()->with('success', 'Profile updated successfully.');
+            \Log::info('Validation passed', ['validated_data' => $validated]);
+            \Log::info('Current user data before update', ['user' => $user->toArray()]);
+
+            // Update user data
+            $updateResult = $user->update($validated);
+
+            // Refresh user data from database
+            $user = $user->fresh();
+
+            \Log::info('Update result', [
+                'success' => $updateResult,
+                'updated_user' => $user->toArray()
+            ]);
+
+            if ($updateResult) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Profile updated successfully',
+                    'data' => $validated
+                ]);
+            } else {
+                \Log::error('Failed to update user profile');
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to update profile'
+                ], 500);
+            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation failed', [
+                'errors' => $e->errors()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Unexpected error during profile update', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'An unexpected error occurred'
+            ], 500);
+        }
     }
 
     public function updatePassword(Request $request)
@@ -79,5 +140,21 @@ class UserController extends Controller
         return back()->with('success', 'Profile image updated successfully.');
     }
 
-
+    public function showAccountSettings()
+    {
+        $user = auth()->user();
+        $data = (object)[
+            'ip' => request()->ip(),
+            'countryName' => 'Philippines', // You can integrate with a real IP geolocation service if needed
+            'countryCode' => 'PH',
+            'regionCode' => 'NCR',
+            'regionName' => 'National Capital Region',
+            'cityName' => 'Manila',
+            'zipCode' => '1000',
+            'latitude' => '14.5995',
+            'longitude' => '120.9842'
+        ];
+        
+        return view('account_settings', compact('user', 'data'));
+    }
 }

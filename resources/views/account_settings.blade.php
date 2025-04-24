@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Account Settings</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 </head>
 <body class="bg--100 min-h-screen flex">
 
@@ -82,18 +85,37 @@
                 <!-- Profile Picture Section -->
                 <div class="flex flex-col items-center">
                     <div class="relative w-40 h-40">
-                        <img src="{{ Auth::user()->profile_image ? asset('storage/' . Auth::user()->profile_image) : asset('images/profile-placeholder.png') }}"
+                        <img src="{{ Auth::user()->profile_image ? asset('storage/profile_images/' . Auth::user()->profile_image) : asset('images/profile-placeholder.png') }}"
                              class="w-full h-full object-cover rounded-full border-4 border-[#8C5A3C] shadow-lg" id="profilePreview">
 
-                        <label for="profile-pic" class="absolute bottom-2 right-2 bg-[#8C5A3C] p-2 rounded-full cursor-pointer shadow-lg hover:bg-[#6A4028] transition">
+                        <form id="profileImageForm" action="{{ route('update.profile.image') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <input type="file" 
+                                   name="profile_image" 
+                                   id="profile-pic" 
+                                   class="hidden" 
+                                   accept="image/*"
+                                   onchange="handleProfileImageUpload(this)">
+                            <label for="profile-pic" 
+                                   class="absolute bottom-2 right-2 bg-[#8C5A3C] p-2 rounded-full cursor-pointer shadow-lg hover:bg-[#6A4028] transition">
                             <img src="{{ asset('images/cameraicon.png') }}" class="w-5 h-5">
                         </label>
+                        </form>
                     </div>
+                    <p id="uploadError" class="text-red-500 text-sm mt-2 hidden"></p>
                 </div>
 
 
-                <!-- User Information Form (Spanning Two Columns) -->
-                <form action="{{ route('update.profile') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- User Information Form -->
+                <div class="relative">
+                    <!-- Edit Toggle Button -->
+                    <button type="button" 
+                            onclick="toggleEditMode()" 
+                            class="absolute -top-2 -right-1 bg-[#8C5A3C] p-2 rounded-full cursor-pointer shadow-lg hover:bg-[#6A4028] transition z-10">
+                        <img src="{{ asset('images/edit.jpg') }}" alt="Edit" class="w-3 h-3">
+                    </button>
+
+                    <form id="userInfoForm" action="{{ route('update.profile') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     @csrf
 
                     <!-- First Name (Non-editable) -->
@@ -107,14 +129,14 @@
                     <div>
                         <label class="block font-semibold">Last Name</label>
                         <input type="text" name="last_name" value="{{ auth()->user()->last_name }}" required
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg form-input" disabled>
                     </div>
 
                     <!-- Birthdate -->
                     <div>
                         <label class="block font-semibold">Birthdate</label>
                         <input type="date" name="birthdate" value="{{ auth()->user()->birthdate }}" required
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg form-input" disabled>
                     </div>
 
                     <!-- Email (Non-editable) -->
@@ -128,13 +150,13 @@
                     <div>
                         <label class="block font-semibold">Phone Number</label>
                         <input type="tel" name="phone_number" value="{{ auth()->user()->phone_number }}"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg form-input" disabled>
                     </div>
 
                     <!-- Gender -->
                     <div>
                         <label class="block font-semibold">Gender</label>
-                        <select name="gender" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                            <select name="gender" required class="w-full px-4 py-2 border border-gray-300 rounded-lg form-input" disabled>
                             <option disabled>Select your gender</option>
                             <option value="Male" {{ auth()->user()->gender == 'Male' ? 'selected' : '' }}>Male</option>
                             <option value="Female" {{ auth()->user()->gender == 'Female' ? 'selected' : '' }}>Female</option>
@@ -142,30 +164,31 @@
                         </select>
                     </div>
 
-
-
-
-                    <div style="border: 1px solid black; margin: 0 auto; padding: 20px; max-width: 600px;">
-                        <h3>IP: {{ $data->ip }}</h3>
-                        <h3>Country Name: {{ $data->countryName }}</h3>
-                        <h3>Country Code: {{ $data->countryCode }}</h3>
-                        <h3>Region Code: {{ $data->regionCode }}</h3>
-                        <h3>Region Name: {{ $data->regionName }}</h3>
-                        <h3>City Name: {{ $data->cityName }}</h3>
-                        <h3>Zipcode: {{ $data->zipCode }}</h3>
-                        <h3>Latitude: {{ $data->latitude }}</h3>
-                        <h3>Longitude: {{ $data->longitude }}</h3>
+                        <!-- Location Information -->
+                        <div class="col-span-2 mt-4">
+                            <label class="block font-semibold">Location</label>
+                            <div class="flex gap-4 items-start">
+                                <div class="flex-1">
+                                    <input type="text" name="location" id="locationInput" value="{{ auth()->user()->location }}"
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg form-input" disabled>
+                                </div>
+                                <button type="button" onclick="getCurrentLocation()"
+                                        class="bg-[#8C5A3C] text-white px-4 py-2 rounded-lg hover:bg-[#6A4028] transition location-btn" disabled>
+                                    Get Current Location
+                                </button>
+                            </div>
+                            <p id="locationError" class="text-red-500 text-sm mt-1 hidden"></p>
                     </div>
 
-
-                    <!-- Save Button -->
-                    <div class="col-span-2 flex justify-end">
+                        <!-- Save Button (Hidden by default) -->
+                        <div id="saveButtonContainer" class="col-span-2 flex justify-end hidden">
                         <button type="submit"
-                                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                                    class="bg-[#8C5A3C] text-white px-6 py-2 rounded-lg hover:bg-[#6A4028] transition">
                             Save Changes
                         </button>
                     </div>
                 </form>
+                </div>
 
             </section>
 
@@ -274,28 +297,6 @@
             heartIcon.classList.add('text-gray-500');
             heartIcon.setAttribute("fill", "none"); // Remove fill color when unfavorited
         }
-    });
-
-    document.addEventListener("DOMContentLoaded", function () {
-        const quantityDisplay = document.getElementById("quantity");
-        const increaseBtn = document.getElementById("increaseBtn");
-        const decreaseBtn = document.getElementById("decreaseBtn");
-
-        let quantity = 1; // Default quantity
-
-        // Increase Quantity
-        increaseBtn.addEventListener("click", function () {
-            quantity++;
-            quantityDisplay.textContent = quantity;
-        });
-
-        // Decrease Quantity (Minimum 1)
-        decreaseBtn.addEventListener("click", function () {
-            if (quantity > 1) {
-                quantity--;
-                quantityDisplay.textContent = quantity;
-            }
-        });
     });
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -422,52 +423,312 @@ document.getElementById("save-password").addEventListener("click", function () {
 
 
     function previewAndSubmit(input) {
-        if (input.files && input.files[0]) {
-            let reader = new FileReader();
-            reader.onload = function (e) {
+        const file = input.files[0];
+        const errorElement = document.getElementById('uploadError');
+        errorElement.classList.add('hidden');
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            errorElement.textContent = 'Please select an image file';
+            errorElement.classList.remove('hidden');
+            return;
+        }
+
+        // Validate file size (2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            errorElement.textContent = 'Image size should be less than 2MB';
+            errorElement.classList.remove('hidden');
+            return;
+        }
+
+        // Preview image
+        const reader = new FileReader();
+        reader.onload = function(e) {
                 document.getElementById('profilePreview').src = e.target.result;
             };
-            reader.readAsDataURL(input.files[0]);
-        }
-        input.form.submit();
+        reader.readAsDataURL(file);
+
+        // Submit form
+        document.getElementById('profileImageForm').submit();
     }
 
+    function toggleEditMode() {
+        const form = document.getElementById('userInfoForm');
+        const inputs = form.querySelectorAll('.form-input');
+        const saveButton = document.getElementById('saveButtonContainer');
+        const locationBtn = document.querySelector('.location-btn');
 
-    function getUserLocation() {
-    if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            document.getElementById("latitude").value = position.coords.latitude;
-            document.getElementById("longitude").value = position.coords.longitude;
-        }, function(error) {
-            alert("Error getting location: " + error.message);
+        inputs.forEach(input => {
+            input.disabled = !input.disabled;
+            if (!input.disabled) {
+                input.classList.add('bg-white');
+                input.classList.remove('bg-gray-100');
+            } else {
+                input.classList.remove('bg-white');
+                input.classList.add('bg-gray-100');
+            }
         });
-    } else {
-        alert("Geolocation is not supported by this browser.");
-    }
-}
 
-function saveLocation() {
-    const latitude = document.getElementById("latitude").value;
-    const longitude = document.getElementById("longitude").value;
+        locationBtn.disabled = !locationBtn.disabled;
+        saveButton.classList.toggle('hidden');
 
-    if (!latitude || !longitude) {
-        alert("Please enter or detect your location first.");
-        return;
+        // If we're enabling editing, attach the form submit handler
+        if (!inputs[0].disabled) {
+            form.removeEventListener('submit', handleFormSubmit); // Remove any existing handler
+            form.addEventListener('submit', handleFormSubmit); // Add the handler
+        }
     }
 
-    fetch("/update-location", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        },
-        body: JSON.stringify({ latitude, longitude })
-    })
-    .then(response => response.json())
-    .then(data => alert(data.message))
-    .catch(error => console.error("Error:", error));
-}
+    // Update the form submission handler
+    function handleFormSubmit(e) {
+        e.preventDefault();
+        
+        const form = e.target;
+        const formData = new FormData(form);
+        
+        // Debug logging
+        console.log('Form Data being sent:');
+        formData.forEach((value, key) => {
+            console.log(`${key}: ${value}`);
+        });
+
+        // Convert FormData to an object for sending
+        const formDataObj = {};
+        formData.forEach((value, key) => {
+            formDataObj[key] = value;
+        });
+
+        console.log('JSON Data being sent:', formDataObj);
+
+        // Make the AJAX request
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(formDataObj)
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Response data:', data);
+            if (data.success) {
+                // Update form fields with new data
+                if (data.data) {
+                    Object.keys(data.data).forEach(key => {
+                        const input = form.querySelector(`[name="${key}"]`);
+                        if (input) {
+                            input.value = data.data[key];
+                        }
+                    });
+                }
+                
+                showNotification('Profile updated successfully', 'success');
+                toggleEditMode();
+            } else {
+                showNotification(data.message || 'Error updating profile', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Error updating profile', 'error');
+        });
+    }
+
+    // Make sure to initialize the form handler when the document loads
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('userInfoForm');
+        if (form) {
+            form.removeEventListener('submit', handleFormSubmit); // Remove any existing handler
+            form.addEventListener('submit', handleFormSubmit); // Add the handler
+        }
+    });
+
+    // Show success message if it exists in the session
+    @if(session('success'))
+        alert("{{ session('success') }}");
+    @endif
+
+    // Show error message if it exists in the session
+    @if($errors->any())
+        alert("{{ $errors->first() }}");
+    @endif
+
+    function getCurrentLocation() {
+        const locationError = document.getElementById('locationError');
+        const locationInput = document.getElementById('locationInput');
+        const form = document.getElementById('userInfoForm');
+
+        locationError.classList.add('hidden');
+        console.log('Getting current location...'); // Debug log
+
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+                    
+                    console.log('Got coordinates:', latitude, longitude); // Debug log
+                    
+                    // Use reverse geocoding to get address
+                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Got address data:', data); // Debug log
+                            const address = data.display_name;
+                            locationInput.value = address;
+                            
+                            // Create FormData and only send the location
+                            const formData = new FormData();
+                            formData.append('location', address);
+                            formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+
+                            console.log('Sending location to server:', address); // Debug log
+
+                            // Use jQuery AJAX which handles FormData better
+                            $.ajax({
+                                url: "{{ route('update.location') }}",
+                                type: 'POST',
+                                data: formData,
+                                processData: false,
+                                contentType: false,
+                                success: function(response) {
+                                    console.log('Server response:', response); // Debug log
+                                    if (response.success) {
+                                        showNotification('Location updated successfully', 'success');
+                                    } else {
+                                        showNotification(response.message || 'Error updating location', 'error');
+                                    }
+                                },
+                                error: function(xhr, status, error) {
+                                    console.error('Error:', error);
+                                    console.error('Response:', xhr.responseText);
+                                    showNotification('Error updating location: ' + error, 'error');
+                                }
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error getting address:', error); // Debug log
+                            locationError.textContent = "Could not get address from coordinates";
+                            locationError.classList.remove('hidden');
+                        });
+                },
+                function(error) {
+                    console.error('Geolocation error:', error); // Debug log
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            locationError.textContent = "Location permission denied. Please allow location access.";
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            locationError.textContent = "Location information unavailable.";
+                            break;
+                        case error.TIMEOUT:
+                            locationError.textContent = "Location request timed out.";
+                            break;
+                        default:
+                            locationError.textContent = "An unknown error occurred.";
+                    }
+                    locationError.classList.remove('hidden');
+                }
+            );
+        } else {
+            locationError.textContent = "Geolocation is not supported by your browser.";
+            locationError.classList.remove('hidden');
+        }
+    }
+
+    // Initialize Pusher
+    const pusher = new Pusher('{{ env('PUSHER_APP_KEY') }}', {
+        cluster: '{{ env('PUSHER_APP_CLUSTER') }}',
+        encrypted: true
+    });
+
+    const channel = pusher.subscribe('user-updates-{{ Auth::id() }}');
+
+    // Listen for profile updates
+    channel.bind('profile-updated', function(data) {
+        updateFormFields(data);
+        showNotification('Profile updated successfully!');
+    });
+
+    // Listen for profile image updates
+    channel.bind('profile-image-updated', function(data) {
+        document.getElementById('profilePreview').src = data.image_url;
+        showNotification('Profile image updated successfully!');
+    });
+
+    // Handle profile image upload
+    function handleProfileImageUpload(input) {
+        const file = input.files[0];
+        if (!file) return;
+
+        // Show loading state
+        const preview = document.getElementById('profilePreview');
+        preview.style.opacity = '0.5';
+
+        const formData = new FormData();
+        formData.append('profile_image', file);
+        formData.append('_token', '{{ csrf_token() }}');
+
+        $.ajax({
+            url: '{{ route('update.profile.image') }}',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                preview.style.opacity = '1';
+                if (response.success) {
+                    showNotification('Profile image updated successfully!');
+                }
+            },
+            error: function(xhr) {
+                preview.style.opacity = '1';
+                showNotification('Error updating profile image', 'error');
+            }
+        });
+    }
+
+    function updateFormFields(data) {
+        Object.keys(data).forEach(key => {
+            const input = document.querySelector(`[name="${key}"]`);
+            if (input) {
+                input.value = data[key];
+            }
+        });
+    }
+
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg ${
+            type === 'success' ? 'bg-green-500' : 'bg-red-500'
+        } text-white z-50 transition-opacity duration-500`;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            setTimeout(() => notification.remove(), 500);
+        }, 3000);
+    }
     </script>
+
+    <style>
+    .form-input:disabled {
+        background-color: #f3f4f6;
+    }
+    .form-input:not(:disabled) {
+        background-color: white;
+    }
+    .notification {
+        transition: opacity 0.5s ease-in-out;
+    }
+    </style>
 
 </body>
 </html>

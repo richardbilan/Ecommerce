@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\DeliveryAddress;
 
 class User extends Authenticatable
 {
@@ -18,18 +20,18 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'id',
         'name',
         'email',
+        'profile_image',
         'password',
+        'remember_token',
         'last_name',
         'birthdate',
         'phone_number',
         'gender',
-        'latitude',
-        'longitude',
-        'profile_image',
-        'type',
-        'location', // Add 'location' here
+        'location',
+        'type'
     ];
 
     /**
@@ -43,41 +45,39 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'birthdate' => 'date',
+    ];
+
+    /**
+     * Get the delivery addresses for the user.
+     */
+    public function deliveryAddresses(): HasMany
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->hasMany(DeliveryAddress::class);
     }
 
     /**
-     * Interact with the user's type.
-     *
-     * @param  string  $value
-     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     * Get the default delivery address for the user.
      */
-    protected function type(): Attribute
+    public function defaultDeliveryAddress(): ?DeliveryAddress // Return type hint added
     {
-        return new Attribute(
-            get: fn ($value) =>  ["user", "admin", "manager"][$value],
-        );
+        // Added null return possibility if no default address exists
+        return $this->deliveryAddresses()->where('is_default', true)->first();
     }
 
     /**
-     * Interact with the user's location.
-     *
-     * @param  string  $value
-     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     * Set the location coordinates.
      */
-    protected function location(): Attribute
+    public function setLocationCoordinates(float $latitude, float $longitude): void
     {
-        return new Attribute(
-            get: fn ($value) => ucfirst($value), // Optionally, capitalize the location
-        );
+        $this->latitude = $latitude;
+        $this->longitude = $longitude;
+        $this->save();
     }
 }

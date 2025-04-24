@@ -190,14 +190,15 @@ class ProductsSeeder extends Seeder
                 'image' => 'images/MENU-BEYOU_CAFE/Non Coffee-Strawberry Lava.png'
             ],
             [
-                'product_name' => 'S’mores Lava',
+                'product_name' => 'S mores Lava',
                 'category' => 'Non-Coffee Series',
                 'price_hot' => null,
                 'price_iced' => 120,
                 'image' => 'images/MENU-BEYOU_CAFE/Latte.png',
                 'tag' => 'New'
             ],
-        ];
+            ];
+       
 
         foreach ($products as $index => $product) {
             $productId = 'PROD-' . str_pad($index + 1, 3, '0', STR_PAD_LEFT);
@@ -220,3 +221,4 @@ class ProductsSeeder extends Seeder
 
     }
 }
+                

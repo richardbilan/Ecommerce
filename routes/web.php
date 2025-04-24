@@ -6,12 +6,15 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\PromotionController;
-use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderController; 
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\PayMongoController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\GCashController;
+use App\Http\Controllers\CafeLocationController;
+use App\Http\Controllers\WebhookController; // added this line
+
 
 Route::post('/pay-with-gcash', [PaymentController::class, 'payWithGCash'])->name('pay.gcash');
 Route::get('/payment-success', function () {
@@ -36,11 +39,15 @@ Route::get('/register', fn() => view('Authentication.Register'))->name('register
 Route::get('/', fn() => view('landing'))->name('landing');
 
 //------------------------------------------ USER ROUTES ------------------------------------------
-Route::middleware(['auth', 'user-access:user'])->group(function () {
+
+Route::middleware(['auth', 'user-access:admin'])->group(function () {
+    Route::get('/admin/home', [HomeController::class, 'adminHome'])->name('admin.home');
+
     Route::get('/home', [ProductController::class, 'home'])->name('home');
     Route::get('/deliveryuser/{orderId}', [OrderController::class, 'showDeliveryUser'])->name('deliveryuser');
     Route::get('/account_settings', fn() => view('account_settings'))->name('account_settings');
 });
+
 
 //------------------------------------------ ADMIN ROUTES ------------------------------------------
 Route::middleware(['auth', 'user-access:admin'])->group(function () {
@@ -69,7 +76,7 @@ Route::middleware(['auth', 'user-access:admin'])->group(function () {
 });
 
 //------------------------------------------ OTHER ROUTES ------------------------------------------
-Route::get('/orders', [HomeController::class, 'orders'])->name('orders');
+Route::get('/orders', [OrderController::class, 'index'])->name('orders');
 Route::get('/delivery', [HomeController::class, 'delivery'])->name('delivery');
 Route::get('/promotions', [HomeController::class, 'promotions'])->name('promotions');
 
@@ -89,7 +96,7 @@ Route::middleware(['auth', 'user-access:admin'])->group(function () {
 });
 //procduct shits
 Route::get('/inventory', [ProductController::class, 'index'])->name('inventory');
-Route::get('/home', [ProductController::class, 'showProducts'])->name('home');
+Route::get('/home', [ProductController::class, 'home'])->name('home');
 Route::get('/inventory/products/search', [ProductController::class, 'search'])->name('products.search');
 
 // User homepage (show active promotions)
@@ -104,7 +111,8 @@ Route::middleware(['auth', 'user-access:admin'])->group(function () {
     Route::delete('/admin/promotions/{id}', [PromotionController::class, 'destroy'])->name('admin.promotions.destroy');
 });
 
-
+// Order status update route for AJAX
+Route::post('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
 
 Route::get('/search', [ProductController::class, 'search'])->name('products.search');
 
@@ -113,7 +121,8 @@ Route::get('/search', [ProductController::class, 'search'])->name('products.sear
 // Example for web.php (for a standard form submission)
 Route::post('/products', [ProductController::class, 'store'])->name('products.store');
 
-Route::view('/deliveryuser', 'deliveryuser')->name('deliveryuser');
+Route::get('/deliveryuser', [OrderController::class, 'deliveryUserIndex'])->name('deliveryuser');
+// Route::view('/deliveryuser', 'deliveryuser')->name('deliveryuser');
 
 //order routes
 
@@ -123,8 +132,6 @@ Route::get('/deliveryuser/{orderId}', [OrderController::class, 'showDeliveryUser
 
 //other routes
 Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
-
-Route::post('/orders/store', [OrderController::class, 'store'])->name('orders.store');
 
 //promotions
 
@@ -141,40 +148,50 @@ Route::get('/check-promo', [PromotionController::class, 'checkPromo']);
 Route::post('/update-profile-image', [UserController::class, 'updateProfileImage'])->name('update.profile.image');
 Route::post('/update-profile', [UserController::class, 'updateProfile'])->name('update.profile');
 Route::post('/update-profile-image', [UserController::class, 'updateProfileImage'])->name('user.updateProfileImage');
-
-
 Route::post('/update-profile', [UserController::class, 'updateProfile'])->name('update.profile');
-
 Route::post('/update-password', [UserController::class, 'updatePassword'])->name('update.password');
 
 
 //favorites
-
-
 Route::post('/favorite/{productId}', [FavoriteController::class, 'toggle'])->middleware('auth');
-
-
 
 Route::post('/update-profile-image', [ProfileController::class, 'updateProfileImage'])->name('update.profile.image');
 
-
-
 //location
+Route::post('/update-location', [AccountController::class, 'updateLocation'])->name('update.location');
+Route::post('/orders/{order}/review', [OrderController::class, 'storeReview'])->name('orders.review');
+Route::get('/gcash-payment-return', [App\Http\Controllers\PaymentController::class, 'gcashPaymentReturn'])->name('gcash.payment.return');
+Route::get('/gcash/payment-success', [App\Http\Controllers\PaymentController::class, 'gcashPaymentSuccess'])->name('gcash.payment.success');
+Route::get('/gcash/payment-failed', [App\Http\Controllers\PaymentController::class, 'gcashPaymentFailed'])->name('gcash.payment.failed');
 
+// Add these routes in the authenticated group
+Route::middleware(['auth'])->group(function () {
+    // Profile update routes
+    Route::post('/profile/update', [AccountController::class, 'updateProfile'])->name('update.profile');
+    Route::post('/profile/image/update', [AccountController::class, 'updateProfileImage'])->name('update.profile.image');
+    Route::post('/profile/location/update', [AccountController::class, 'updateLocation'])->name('update.location');
+});
 
+// Location management routes
+Route::middleware(['auth', 'user-access:admin'])->group(function () {
+    Route::get('/location', [CafeLocationController::class, 'index'])->name('location');
+});
 
-//payment
+// Order placement
+Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+
+// GCash/PayMongo payment link creation (AJAX)
+Route::post('/paymongo/gcash', [PayMongoController::class, 'payWithGCash'])->name('paymongo.gcash');
+
+// GCash redirect form handler
+Route::post('/pay-gcash-link', [App\Http\Controllers\PaymentController::class, 'payWithGCashLink'])->name('pay.gcash.link');
+
+// GCash/PayMongo payment status and callbacks (keep as needed)
+Route::get('/gcash-payment-return', [App\Http\Controllers\PaymentController::class, 'gcashPaymentReturn'])->name('gcash.payment.return');
+Route::get('/gcash/payment-success', [App\Http\Controllers\PaymentController::class, 'gcashPaymentSuccess'])->name('gcash.payment.success');
+Route::get('/gcash/payment-failed', [App\Http\Controllers\PaymentController::class, 'gcashPaymentFailed'])->name('gcash.payment.failed');
 Route::get('/gcash/callback', function () {
     return redirect('deliveryuser')->with('success', 'Payment completed!');
 })->name('gcash.callback');
-Route::post('/paymongo/gcash', [OrderController::class, 'gcashCheckout']);
 
-Route::get('/payment/success', function () {
-    return view('payment.success'); // Ensure you have a 'payment.success' view
-})->name('payment.success');
-
-Route::get('/payment/cancel', function () {
-    return view('payment.cancel'); // Ensure you have a 'payment.cancel' view or modify as needed
-})->name('payment.cancel');
-Route::post('/paymongo/gcash', [PayMongoController::class, 'createGCashPayment']);
-Route::post('/paymongo/gcash', [PayMongoController::class, 'payWithGCash']);
+Route::post('webhook-receiver', [App\Http\Controllers\WebhookController::class, 'webhook'])->name('webhook');

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -55,12 +56,14 @@ class LoginController extends Controller
 
         if(auth()->attempt(array('email' => $input['email'], 'password' => $input['password'])))
         {
-            if (auth()->user()->type == 'admin') {
+            $user = auth()->user();
+            if ($user->type == 1 || $user->type === 'admin') {
                 return redirect()->route('admin.home');
-            }else if (auth()->user()->type == 'manager') {
-                return redirect()->route('manager.home');
-            }else{
+            } else if ($user->type == 0 || $user->type === 'user') {
                 return redirect()->route('home');
+            } else {
+                Auth::logout();
+                return redirect()->route('login')->withErrors(['login' => 'Unauthorized access.']);
             }
         }else{
             return redirect()->route('login')

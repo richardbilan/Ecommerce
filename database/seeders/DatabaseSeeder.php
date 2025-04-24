@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             CreateUsersSeeder::class,
             ProductsSeeder::class,
             PostSeeder::class,
+            CafeLocationSeeder::class,
         ]);
 
         // Optional factory example (commented out for now)

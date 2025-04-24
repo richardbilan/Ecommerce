@@ -13,25 +13,39 @@ h1 {
     height: 100vh;
 }
 
+/*==============================
+  TOP BAR: Search + Shop Status
+==============================*/
+
+.container {
+    padding: 20px;
+}
+
+.top-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin: 0 0 20px 0;
+}
+
 
 /*==============================
   INVENTORY CONTAINER
 ==============================*/
 
 .inventory-list {
-    margin-left: 20px;
-    margin-top: 20px;
-    padding: 20px;
     background: white;
-    border-radius: 10px;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-    width: auto;
-}
-
-.top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin: 0 20px;
 }
 
 .inventory-container {
@@ -42,39 +56,35 @@ h1 {
 
 
 /*==============================
-  TOP BAR: Search + Shop Status
-==============================*/
-
-.top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-
-/*==============================
   SEARCH BAR
 ==============================*/
 
 .search-container {
-    margin-left: 610px;
-    display: flex;
-    align-items: center;
     position: relative;
     width: 300px;
 }
 
 .search-container input {
     width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    padding: 10px 36px 10px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.search-container input:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
 .search-container i {
     position: absolute;
-    right: 10px;
-    color: gray;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
 }
 
 
@@ -83,45 +93,52 @@ h1 {
 ==============================*/
 
 .shop-status {
-    margin-left: 20px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+}
+
+.shop-status label {
+    font-weight: 600;
+    color: #374151;
 }
 
 .toggle {
-    width: 40px;
-    height: 20px;
-    appearance: none;
-    background: #ccc;
-    border-radius: 10px;
     position: relative;
+    width: 50px;
+    height: 26px;
+    appearance: none;
+    background-color: #e5e7eb;
+    border-radius: 13px;
     cursor: pointer;
+    transition: all 0.3s;
+    outline: none;
 }
 
 .toggle:checked {
-    background: green;
+    background-color: #10b981;
 }
 
 .toggle::before {
     content: "";
     position: absolute;
-    width: 18px;
-    height: 18px;
-    background: white;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
-    top: 1px;
+    background-color: white;
+    top: 2px;
     left: 2px;
-    transition: 0.3s;
+    transition: transform 0.3s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
 .toggle:checked::before {
-    left: 20px;
+    transform: translateX(24px);
 }
 
 .status-label {
-    font-weight: bold;
-    color: green;
+    font-weight: 600;
+    min-width: 60px;
 }
 
 
@@ -129,13 +146,14 @@ h1 {
   INVENTORY LIST - FULL WIDTH
 ==============================*/
 
-.inventory-list {
-    margin-left: 20px;
-    padding: 20px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-    width: auto;
+.inventory-list h2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #374151;
 }
 
 
@@ -145,19 +163,27 @@ h1 {
 
 table {
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-th,
-td {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-    text-align: left;
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
 th {
-    background: #f5f5f5;
+    background-color: #f9fafb;
+    color: #374151;
+    font-weight: 600;
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #4b5563;
+}
+
+tr:hover td {
+    background-color: #f9fafb;
 }
 
 
@@ -166,8 +192,11 @@ th {
 ==============================*/
 
 .add-icon {
+    padding: 8px;
+    border-radius: 4px;
     cursor: pointer;
-    color: green;
+    color: #10b981;
+    transition: background-color 0.2s;
 }
 
 .edit-icon {
@@ -181,6 +210,31 @@ th {
     cursor: pointer;
 }
 
+.edit-btn, .delete-btn {
+    padding: 6px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-right: 8px;
+}
+
+.edit-btn {
+    color: #3b82f6;
+}
+
+.delete-btn {
+    color: #ef4444;
+}
+
+.edit-btn:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
+.delete-btn:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
 
 /*==============================
   MODAL STYLING (OVERLAY)
@@ -188,22 +242,14 @@ th {
 
 .modal {
     display: none;
-    /* Hidden by default */
     position: fixed;
     z-index: 1000;
-    /* Sit on top */
     left: 0;
     top: 0;
     width: 100%;
-    /* Full width */
     height: 100%;
-    /* Full height */
-    overflow: auto;
-    /* Enable scroll if needed */
     background-color: rgba(0, 0, 0, 0.5);
-    /* Black with opacity */
-    padding-top: 100px;
-    /* Location of the box */
+    animation: fadeIn 0.2s;
 }
 
 
@@ -212,13 +258,36 @@ th {
 ==============================*/
 
 .modal-content {
-    background-color: #fefefe;
-    margin: auto;
-    padding: 20px;
-    border-radius: 10px;
-    width: 80%;
-    max-width: 600px;
-    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
+    background-color: white;
+    margin: 2% auto;
+    padding: 24px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    animation: slideIn 0.3s;
+    position: relative;
+}
+
+/* Style the scrollbar for better visibility */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: #666;
 }
 
 
@@ -261,17 +330,126 @@ select {
 ==============================*/
 
 .btn-add {
-    background-color: #a67c52;
+    background-color: #10b981;
     color: white;
+    padding: 10px 20px;
     border: none;
-    padding: 10px;
-    border-radius: 5px;
+    border-radius: 6px;
+    font-weight: 500;
     cursor: pointer;
-    width: 100%;
-    font-weight: bold;
-    transition: background-color 0.3s;
+    transition: background-color 0.2s;
 }
 
 .btn-add:hover {
-    background-color: #856644;
+    background-color: #059669;
+}
+
+.btn-save {
+    background-color: #3b82f6;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    width: 100%;
+}
+
+.btn-save:hover {
+    background-color: #2563eb;
+}
+
+
+/*==============================
+  Animations
+==============================*/
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+
+/*==============================
+  Notifications
+==============================*/
+
+.notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 24px;
+    border-radius: 6px;
+    color: white;
+    font-weight: 500;
+    z-index: 1000;
+    animation: slideUp 0.3s;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.product-thumbnail {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.no-image {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #666;
+}
+
+#currentImage img {
+    max-width: 100px;
+    margin-top: 10px;
+}
+
+/* Style for file inputs */
+input[type="file"] {
+    border: 1px solid #ddd;
+    padding: 8px;
+    border-radius: 4px;
+    width: 100%;
+}
+
+/* Style for tag input */
+input[name="tag"] {
+    border: 1px solid #ddd;
+    padding: 8px;
+    border-radius: 4px;
+    width: 100%;
+}
+
+/* Add some spacing between form elements */
+.mb-4 {
+    margin-bottom: 1rem;
 }

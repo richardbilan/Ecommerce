@@ -3,69 +3,113 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Exception;
+use Illuminate\Support\Facades\Log;
 
 class PayMongoService
 {
     protected $secretKey;
+    protected $baseUrl = 'https://api.paymongo.com/v1';
 
     public function __construct()
     {
         $this->secretKey = config('services.paymongo.secret_key');
-        $redirectUrl = config('services.paymongo.redirect_url');
-
+        if (!$this->secretKey) {
+            throw new Exception('PayMongo secret key is not configured.');
+        }
     }
 
-    public function createGCashSource($amount, $redirectUrl)
+    /**
+     * Create a GCash payment session
+     * 
+     * @param float $amount Amount in PHP (will be converted to centavos)
+     * @param array $billing Billing information
+     * @param array $urls Success and failure redirect URLs
+     * @param string $description Payment description
+     * @return array
+     * @throws Exception
+     */
+    public function createGCashPayment($amount, array $billing, array $urls, $description = null)
     {
-        $response = Http::withBasicAuth($this->secretKey, '')
-            ->post('https://api.paymongo.com/v1/sources', [
+        try {
+            // Validate required parameters
+            if (!isset($urls['success']) || !isset($urls['failed'])) {
+                throw new Exception('Success and failed redirect URLs are required.');
+            }
+
+            if (!isset($billing['name']) || !isset($billing['email'])) {
+                throw new Exception('Billing name and email are required.');
+            }
+
+            // Convert amount to centavos and ensure it's an integer
+            $amountInCentavos = (int)($amount * 100);
+
+            $payload = [
                 'data' => [
                     'attributes' => [
-                        'amount' => $amount * 100, // in centavos
-                        'redirect' => [
-                            'success' => $redirectUrl,
-                            'failed' => $redirectUrl,
+                        'billing' => [
+                            'name' => $billing['name'],
+                            'email' => $billing['email'],
+                            'phone' => $billing['phone'] ?? null,
                         ],
-                        'type' => 'gcash',
+                        'payment_method_types' => ['gcash'],
+                        'amount' => $amountInCentavos,
                         'currency' => 'PHP',
+                        'description' => $description ?? 'GCash Payment',
+                        'statement_descriptor' => substr($description ?? 'GCash Payment', 0, 25),
+                        'redirect' => [
+                            'success' => $urls['success'],
+                            'failed' => $urls['failed']
+                        ]
                     ]
                 ]
+            ];
+
+            $response = Http::withBasicAuth($this->secretKey, '')
+                ->post("{$this->baseUrl}/checkout_sessions", $payload);
+
+            if (!$response->successful()) {
+                Log::error('PayMongo Error', [
+                    'status' => $response->status(),
+                    'response' => $response->json()
+                ]);
+                throw new Exception('Failed to create PayMongo checkout session: ' . $response->json()['errors'][0]['detail'] ?? 'Unknown error');
+            }
+
+            return $response->json();
+        } catch (Exception $e) {
+            Log::error('PayMongo Service Error', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
-
-        return $response->json();
+            throw $e;
+        }
     }
-    public function createCheckout($amount, $type, $successUrl, $cancelUrl)
-{
-    $payload = [
-        'data' => [
-            'attributes' => [
-                'billing' => [
-                    'name' => 'Customer',
-                    'email' => 'customer@email.com'
-                ],
-                'payment_method_types' => [$type],
-                'amount' => $amount,
-                'currency' => 'PHP',
-                'description' => 'GCash Order Payment',
-                'statement_descriptor' => 'Cafe Payment',
-                'redirect' => [
-                    'success' => $successUrl,
-                    'failed' => $cancelUrl
-                ]
-            ]
-        ]
-    ];
 
-    $client = new \GuzzleHttp\Client();
-    $response = $client->post('https://api.paymongo.com/v1/checkout_sessions', [
-        'headers' => [
-            'Authorization' => 'Basic ' . base64_encode(env('PAYMONGO_SECRET_KEY') . ':'),
-            'Content-Type'  => 'application/json'
-        ],
-        'body' => json_encode($payload)
-    ]);
+    /**
+     * Verify a payment session status
+     * 
+     * @param string $sessionId
+     * @return array
+     * @throws Exception
+     */
+    public function verifyPaymentSession($sessionId)
+    {
+        try {
+            $response = Http::withBasicAuth($this->secretKey, '')
+                ->get("{$this->baseUrl}/checkout_sessions/{$sessionId}");
 
-    return json_decode($response->getBody(), true);
-}
+            if (!$response->successful()) {
+                throw new Exception('Failed to verify payment session');
+            }
 
+            return $response->json();
+        } catch (Exception $e) {
+            Log::error('PayMongo Verification Error', [
+                'session_id' => $sessionId,
+                'message' => $e->getMessage()
+            ]);
+            throw $e;
+        }
+    }
 }

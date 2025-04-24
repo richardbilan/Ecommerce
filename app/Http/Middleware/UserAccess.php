@@ -15,7 +15,13 @@ class UserAccess
      */
     public function handle(Request $request, Closure $next, $userType): Response
     {
-        if(auth()->user()->type == $userType){
+        $userTypeMap = [
+            'user' => 0,
+            'admin' => 1,
+            'manager' => 2
+        ];
+
+        if (auth()->user()->getRawOriginal('type') == $userTypeMap[$userType]) {
             return $next($request);
         }
           

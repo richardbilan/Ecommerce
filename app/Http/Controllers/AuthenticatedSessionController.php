@@ -65,8 +65,8 @@ class AuthenticatedSessionController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
     
-        // Redirect to landing page after logout
-        return redirect()->route('/'); // or ->to('/') if you prefer
+        // Always redirect to root URL after logout
+        return redirect('/');
     }
     
 }
