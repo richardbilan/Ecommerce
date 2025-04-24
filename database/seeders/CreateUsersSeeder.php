@@ -41,10 +41,7 @@ class CreateUsersSeeder extends Seeder
             User::updateOrCreate(
                 ['email' => $user['email']], // Check if the email exists
                 $user // If exists, update; if not, create new user
-
             );
         }
-        $this->call(CreateUsersSeeder::class);
-
     }
 }
